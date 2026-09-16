@@ -1,0 +1,718 @@
+{
+  "ids": {
+    "tag": "QA6625201",
+    "memberUserId": 73,
+    "memberId": 66,
+    "trainerUserId": 74,
+    "trainerId": 16,
+    "planId": 10,
+    "walkinId": 68,
+    "subscriptionId": 80,
+    "paymentId": 106,
+    "attendanceId": 308,
+    "assignmentId": 62,
+    "exerciseId": 37,
+    "workoutPlanId": 21,
+    "memberWorkoutId": 105,
+    "classId": 15,
+    "scheduleId": 53
+  },
+  "results": [
+    {
+      "area": "Health",
+      "name": "API up and database connected",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Login",
+      "name": "admin signs in → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Login",
+      "name": "receptionist signs in → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Login",
+      "name": "wrong password rejected → 401",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Register member",
+      "name": "self-registration → 201",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Register member",
+      "name": "DB: users + members rows linked, role member, active",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Register member",
+      "name": "DB: member_code has random suffix (MEM + 17 chars)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Register member",
+      "name": "DB: email verification token issued",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Register member",
+      "name": "GET /auth/me returns the new account",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Register member",
+      "name": "duplicate email rejected → 409",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Trainer approval",
+      "name": "trainer registration → 201",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Trainer approval",
+      "name": "no token issued while pending",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Trainer approval",
+      "name": "DB: user pending, trainer inactive",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Trainer approval",
+      "name": "admin sees it in pending list",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Trainer approval",
+      "name": "pending trainer cannot sign in → 403",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Trainer approval",
+      "name": "admin approves → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Trainer approval",
+      "name": "DB: user active, trainer active",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Trainer approval",
+      "name": "DB: audit log written",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Trainer approval",
+      "name": "approved trainer signs in → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Plans",
+      "name": "admin creates plan → 201",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Plans",
+      "name": "DB: plan row exists",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Plans",
+      "name": "admin updates price → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Plans",
+      "name": "DB: price now 1099",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Plans",
+      "name": "member can browse plans incl. new one",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Plans",
+      "name": "member cannot create plan → 403",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Members",
+      "name": "receptionist creates walk-in member → 201",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Members",
+      "name": "receptionist edits member → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Members",
+      "name": "DB: phone and address updated",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Members",
+      "name": "search finds both QA members",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Members",
+      "name": "member cannot open another member → 403",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Members",
+      "name": "member edits own profile → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Members",
+      "name": "DB: own address saved",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Subscriptions & payments",
+      "name": "assign plan (UPI) → 201",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Subscriptions & payments",
+      "name": "DB: active subscription, 1 month long",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Subscriptions & payments",
+      "name": "DB: payment 1099 via upi, completed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Subscriptions & payments",
+      "name": "DB: audit log written",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Subscriptions & payments",
+      "name": "second active subscription blocked → 409",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Subscriptions & payments",
+      "name": "member sees own subscription with plan_name (fix)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Subscriptions & payments",
+      "name": "dates returned as YYYY-MM-DD (fix)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Subscriptions & payments",
+      "name": "mark payment partially refunded → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Subscriptions & payments",
+      "name": "DB: payment status + notes updated",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Subscriptions & payments",
+      "name": "DB: payment change audited",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Subscriptions & payments",
+      "name": "member cannot list all payments → 403",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Subscriptions & payments",
+      "name": "member sees own payments",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Attendance",
+      "name": "check in → 201",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Attendance",
+      "name": "DB: open check-in row",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Attendance",
+      "name": "double check-in blocked → 409",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Attendance",
+      "name": "check out → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Attendance",
+      "name": "DB: check_out_time recorded",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Attendance",
+      "name": "member sees own visit, date as YYYY-MM-DD",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Trainer rosters",
+      "name": "trainer blocked before assignment → 403",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Trainer rosters",
+      "name": "receptionist assigns trainer → 201",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Trainer rosters",
+      "name": "DB: active assignment",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Trainer rosters",
+      "name": "trainer can now open the member → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Trainer rosters",
+      "name": "trainer member list is only their roster",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Trainer rosters",
+      "name": "trainer dashboard roster count = 1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Exercises",
+      "name": "admin creates exercise → 201",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Exercises",
+      "name": "trainer edits exercise → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Exercises",
+      "name": "DB: edit saved",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Exercises",
+      "name": "member cannot edit exercise → 403",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Exercises",
+      "name": "admin deletes exercise → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Exercises",
+      "name": "DB: row deleted",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Workouts",
+      "name": "trainer creates plan with an exercise → 201",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Workouts",
+      "name": "DB: plan owned by trainer, 1 exercise row",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Workouts",
+      "name": "admin must name a trainer → 400",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Workouts",
+      "name": "trainer assigns plan to roster member → 201",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Workouts",
+      "name": "member updates progress → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Workouts",
+      "name": "DB: in_progress at 40%, assigned by trainer",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Workouts",
+      "name": "member logs a session → 201",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Workouts",
+      "name": "DB: session row for the member",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Workouts",
+      "name": "member dashboard shows session + plan + subscription",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Classes",
+      "name": "admin creates class → 201",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Classes",
+      "name": "admin schedules a session today → 201",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Classes",
+      "name": "DB: schedule row for today, capacity 1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Classes",
+      "name": "trainer double-booking blocked → 409",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Classes",
+      "name": "member enrols in today's class (date fix) → 201",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Classes",
+      "name": "DB: booking recorded",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Classes",
+      "name": "class full blocks second member → 409",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Classes",
+      "name": "admin cancels session, 1 booking released",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Classes",
+      "name": "DB: booking now cancelled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Classes",
+      "name": "cancelled session hidden from members",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Classes",
+      "name": "admin still sees cancelled session",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Classes",
+      "name": "admin edits class → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Classes",
+      "name": "DB: class edit saved",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Dashboards & reports",
+      "name": "admin overview loads",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Dashboards & reports",
+      "name": "revenue chart data loads",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Dashboards & reports",
+      "name": "revenue report loads → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Dashboards & reports",
+      "name": "receptionist blocked from revenue report → 403",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Dashboards & reports",
+      "name": "receptionist members report → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Dashboards & reports",
+      "name": "member blocked from staff dashboard → 403",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Account security",
+      "name": "change password → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Account security",
+      "name": "DB: token_version bumped",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Account security",
+      "name": "old session revoked → 401",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Account security",
+      "name": "new session works → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Account security",
+      "name": "logout → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Account security",
+      "name": "DB: revoked_tokens row",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Account security",
+      "name": "logged-out token rejected → 401",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Account security",
+      "name": "forgot password → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Account security",
+      "name": "DB: reset token issued",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Account security",
+      "name": "reset email written to dev outbox",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Account security",
+      "name": "reset password with emailed link → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Account security",
+      "name": "DB: reset token marked used",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Account security",
+      "name": "reset link cannot be reused → 400",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Account security",
+      "name": "sign in with the new password → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Access control",
+      "name": "no token → 401",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Access control",
+      "name": "invalid id → 422",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Access control",
+      "name": "trainer cannot delete members → 403",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Access control",
+      "name": "trainer sees only own roster assignments",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Access control",
+      "name": "chat status endpoint → 200",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Frontend",
+      "name": "dev server serves /",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Frontend",
+      "name": "dev server serves /login",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Frontend",
+      "name": "dev server serves /exercises",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Frontend",
+      "name": "dev server serves /class-management",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Frontend",
+      "name": "dev server serves /trainer-assignments",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Frontend",
+      "name": "dev server serves /account",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "Frontend",
+      "name": "API allows the frontend origin (CORS)",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

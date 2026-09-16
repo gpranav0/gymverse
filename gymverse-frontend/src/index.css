@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #4d8dff;
+  --color-secondary: #34d399;
+  --color-dark: #070a14;
+
+  --color-ink: #eef3ff;
+  --color-ink-soft: #c3ccdd;
+  --color-ink-muted: #98a3b8;
+
+  --color-warn: #fbbf24;
+  --color-danger: #fb7185;
+  --color-violet: #a78bfa;
+
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, monospace;
+
+  /*
+   * `backwards` (not `both`): entrance animations need the *start* frame held
+   * during their stagger delay, but holding the *end* frame forever leaves the
+   * animated element's used `transform`/`filter` at an interpolated non-`none`
+   * value (e.g. `matrix(1,0,0,1,0,0)` instead of the literal `none`) — which
+   * permanently makes it a containing block for `position: fixed` descendants.
+   * `<main>` in DashboardLayout wraps every page's <Modal>, so with `both` every
+   * modal on a page taller than one screen rendered clipped inside <main>'s box
+   * instead of the viewport. Dropping the forwards-hold is visually identical
+   * (the interpolated end state and the reverted cascade default render the
+   * same pixels) and removes the trap.
+   */
+  --animate-rise-in: riseIn 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+  --animate-screen-in: screenIn 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+  --animate-grow-bar: growBar 0.95s cubic-bezier(0.2, 0.75, 0.2, 1) backwards;
+  --animate-grow-width: growWidth 1s cubic-bezier(0.2, 0.75, 0.2, 1) backwards;
+}
+
+/* Runtime-tunable glass knobs (see AppBackdrop / useGlassTheme). */
+:root {
+  --gv-accent: #4d8dff;
+  --gv-blur: 18px;
+}
+
+@keyframes gridDrift {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 64px 64px, 64px 64px; }
+}
+@keyframes glowA {
+  0%, 100% { transform: translate3d(-4%, -3%, 0) scale(1); }
+  50% { transform: translate3d(9%, 7%, 0) scale(1.2); }
+}
+@keyframes glowB {
+  0%, 100% { transform: translate3d(5%, 5%, 0) scale(1.12); }
+  50% { transform: translate3d(-7%, -6%, 0) scale(0.9); }
+}
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(16px); filter: blur(7px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes shimmer {
+  from { transform: translateX(-120%); }
+  to { transform: translateX(220%); }
+}
+@keyframes growBar {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+@keyframes growWidth {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+body {
+  margin: 0;
+  background: #05070d;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: #9ec2ff; text-decoration: none; }
+a:hover { color: #cbdeff; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.12);
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(255 255 255 / 0.22);
+  background-clip: content-box;
+}
+
+@layer components {
+  /* The single source of truth for the glass surface. */
+  .glass {
+    background: linear-gradient(155deg, rgb(255 255 255 / 0.075), rgb(255 255 255 / 0.028));
+    backdrop-filter: blur(var(--gv-blur)) saturate(150%);
+    -webkit-backdrop-filter: blur(var(--gv-blur)) saturate(150%);
+    border: 1px solid rgb(255 255 255 / 0.1);
+    border-radius: 20px;
+    box-shadow:
+      0 26px 60px -26px rgb(0 0 0 / 0.75),
+      inset 0 1px 0 rgb(255 255 255 / 0.12);
+  }
+  .glass-flat {
+    background: linear-gradient(155deg, rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.026));
+    backdrop-filter: blur(var(--gv-blur)) saturate(150%);
+    -webkit-backdrop-filter: blur(var(--gv-blur)) saturate(150%);
+    border: 1px solid rgb(255 255 255 / 0.1);
+    border-radius: 18px;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
+  }
+  .glass-inset {
+    background: rgb(255 255 255 / 0.035);
+    border: 1px solid rgb(255 255 255 / 0.07);
+    border-radius: 14px;
+  }
+  .glass-hover {
+    transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.28s, border-color 0.28s;
+  }
+  .glass-hover:hover {
+    transform: translateY(-6px);
+    border-color: rgb(255 255 255 / 0.2);
+    box-shadow:
+      0 36px 70px -26px rgb(0 0 0 / 0.85),
+      inset 0 1px 0 rgb(255 255 255 / 0.18);
+  }
+  .field {
+    background: rgb(255 255 255 / 0.05);
+    border: 1px solid rgb(255 255 255 / 0.13);
+    border-radius: 12px;
+    padding: 0.75rem 0.875rem;
+    color: var(--color-ink);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .field:focus {
+    border-color: var(--gv-accent);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--gv-accent) 22%, transparent);
+  }
+  .btn-primary {
+    border: none;
+    border-radius: 12px;
+    padding: 0.7rem 1.1rem;
+    font-weight: 700;
+    color: #04070f;
+    background: linear-gradient(140deg, var(--gv-accent), #8ab6ff);
+    box-shadow: 0 14px 30px -14px var(--gv-accent);
+    transition: transform 0.18s;
+    cursor: pointer;
+  }
+  .btn-primary:hover { transform: translateY(-2px); }
+  .btn-ghost {
+    border-radius: 11px;
+    padding: 0.55rem 0.85rem;
+    font-weight: 600;
+    color: #dbe4f5;
+    background: rgb(255 255 255 / 0.06);
+    border: 1px solid rgb(255 255 255 / 0.12);
+    transition: background 0.2s;
+    cursor: pointer;
+  }
+  .btn-ghost:hover { background: rgb(255 255 255 / 0.14); }
+  .label-caps {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9aa6bc;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -1,0 +1,1113 @@
+openapi: 3.0.0
+info:
+  title: GymVerse REST API
+  description: |
+    API documentation for GymVerse — The Smart Gym & Fitness Management System.
+
+    **Authentication.** All endpoints require a bearer JWT unless marked otherwise.
+    Obtain one from `POST /api/auth/login` and send it as `Authorization: Bearer <token>`.
+
+    **Roles.** `admin`, `receptionist`, `trainer`, `member`. Endpoints list the roles
+    permitted; members are additionally restricted to their own records.
+
+    **Response envelope.** Every response is `{ success, message?, data?, meta? }`.
+    Errors return `{ success: false, message }` — the `error` field carrying a stack
+    trace is only present when `NODE_ENV=development`.
+
+    **Pagination.** List endpoints accept `page` (default 1) and `limit` (default 20,
+    maximum 1000) and return a `meta` object.
+  version: 1.1.0
+servers:
+  - url: http://localhost:5000
+    description: Local Development Server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 1, default: 1 }
+      description: 1-based page number. Values below 1 are clamped to 1.
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 1000, default: 20 }
+      description: Rows per page. Values above the maximum are clamped.
+    Search:
+      name: search
+      in: query
+      schema: { type: string }
+      description: Case-insensitive partial match.
+    IdPath:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer }
+
+  schemas:
+    Meta:
+      type: object
+      properties:
+        page: { type: integer, example: 1 }
+        limit: { type: integer, example: 20 }
+        total: { type: integer, example: 137 }
+        totalPages: { type: integer, example: 7 }
+
+    Envelope:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string }
+        data: {}
+        meta: { $ref: '#/components/schemas/Meta' }
+
+    Error:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        message: { type: string, example: 'Forbidden: You can only view your own profile' }
+
+    LoginCredentials:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email, example: admin@gymverse.com }
+        password: { type: string, format: password, example: Password@123 }
+
+    RegisterRequest:
+      type: object
+      required: [username, name, phone, email, password, role_name]
+      properties:
+        username: { type: string }
+        name: { type: string }
+        phone: { type: string }
+        email: { type: string, format: email }
+        password: { type: string, format: password, minLength: 6 }
+        role_name:
+          type: string
+          enum: [member, trainer]
+          description: Public registration is limited to these two roles. Trainers are created with status `pending` and cannot log in until an admin approves them.
+        specialization: { type: string, description: Trainers only. }
+        qualification: { type: string, description: Trainers only. }
+
+    AuthSuccess:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string, example: Login successful }
+        data:
+          type: object
+          properties:
+            user_id: { type: integer }
+            username: { type: string }
+            email: { type: string }
+            role: { type: string, enum: [admin, receptionist, trainer, member] }
+            member_id: { type: integer, nullable: true }
+            trainer_id: { type: integer, nullable: true }
+            token: { type: string, description: JWT bearer token. }
+
+    Member:
+      type: object
+      properties:
+        member_id: { type: integer }
+        member_code: { type: string }
+        member_name: { type: string }
+        gender: { type: string, enum: [Male, Female, Other] }
+        date_of_birth: { type: string, format: date }
+        phone: { type: string }
+        email: { type: string, format: email }
+        address: { type: string }
+        emergency_contact_name: { type: string }
+        emergency_contact_phone: { type: string }
+        join_date: { type: string, format: date }
+        status: { type: string, enum: [active, inactive, suspended, expired] }
+
+    Trainer:
+      type: object
+      description: >
+        `phone` and `email` are omitted when the caller has the `member` role.
+      properties:
+        trainer_id: { type: integer }
+        trainer_code: { type: string }
+        trainer_name: { type: string }
+        specialization: { type: string }
+        qualification: { type: string }
+        experience_years: { type: integer }
+        shift: { type: string }
+        bio: { type: string }
+        phone: { type: string }
+        email: { type: string, format: email }
+        status: { type: string, enum: [active, inactive] }
+
+    MembershipPlan:
+      type: object
+      properties:
+        plan_id: { type: integer }
+        plan_name: { type: string }
+        description: { type: string }
+        duration_months: { type: integer, minimum: 1 }
+        price: { type: string, description: 'NUMERIC(10,2), serialised as a string by pg.' }
+        access_level: { type: string }
+        personal_training_sessions: { type: integer }
+        class_access: { type: boolean }
+        diet_consultation: { type: boolean }
+        status: { type: string, enum: [active, inactive] }
+
+    Subscription:
+      type: object
+      properties:
+        subscription_id: { type: integer }
+        member_id: { type: integer }
+        plan_id: { type: integer }
+        start_date: { type: string, format: date }
+        end_date: { type: string, format: date }
+        subscription_status: { type: string, enum: [pending, active, expired, cancelled, suspended] }
+        auto_renew: { type: boolean }
+
+    Payment:
+      type: object
+      properties:
+        payment_id: { type: integer }
+        subscription_id: { type: integer }
+        member_id: { type: integer }
+        amount: { type: string }
+        payment_date: { type: string, format: date-time }
+        payment_method: { type: string, enum: [cash, card, upi, bank_transfer] }
+        payment_status: { type: string, enum: [pending, completed, failed, refunded, partially_refunded] }
+        notes: { type: string }
+
+    Attendance:
+      type: object
+      properties:
+        attendance_id: { type: integer }
+        member_id: { type: integer }
+        member_name: { type: string }
+        attendance_date: { type: string, format: date }
+        check_in_time: { type: string }
+        check_out_time: { type: string, nullable: true }
+        check_in_method: { type: string, enum: [manual, qr, biometric, app] }
+
+    Exercise:
+      type: object
+      properties:
+        exercise_id: { type: integer }
+        exercise_name: { type: string }
+        description: { type: string }
+        muscle_group: { type: string }
+        secondary_muscle_group: { type: string }
+        equipment_required: { type: string }
+        difficulty_level: { type: string, enum: [beginner, intermediate, advanced] }
+        instructions: { type: string }
+
+    WorkoutPlan:
+      type: object
+      properties:
+        workout_plan_id: { type: integer }
+        trainer_id: { type: integer, nullable: true }
+        plan_name: { type: string }
+        description: { type: string }
+        goal_type: { type: string }
+        difficulty_level: { type: string, enum: [beginner, intermediate, advanced] }
+        duration_weeks: { type: integer }
+        status: { type: string, enum: [active, inactive] }
+
+    FitnessClass:
+      type: object
+      properties:
+        class_id: { type: integer }
+        class_name: { type: string }
+        description: { type: string }
+        difficulty_level: { type: string, enum: [beginner, intermediate, advanced] }
+        duration_minutes: { type: integer }
+        status: { type: string, enum: [active, inactive] }
+
+    ClassSchedule:
+      type: object
+      properties:
+        schedule_id: { type: integer }
+        class_id: { type: integer }
+        class_name: { type: string }
+        trainer_id: { type: integer }
+        trainer_name: { type: string }
+        class_date: { type: string, format: date }
+        start_time: { type: string }
+        end_time: { type: string }
+        capacity: { type: integer }
+        room: { type: string }
+        enrolled_count: { type: string }
+
+  responses:
+    Unauthorized:
+      description: Missing, malformed or expired JWT.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Forbidden:
+      description: Authenticated but the role (or record ownership) does not permit this action.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Resource does not exist.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Conflict:
+      description: Violates a business rule (duplicate, capacity reached, dependent rows).
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    ValidationError:
+      description: Request body failed validation.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: System
+  - name: Authentication
+  - name: Members
+  - name: Trainers
+  - name: Membership Plans
+  - name: Subscriptions
+  - name: Payments
+  - name: Attendance
+  - name: Exercises
+  - name: Workout Plans
+  - name: Member Workouts
+  - name: Workout Sessions
+  - name: Classes
+  - name: Schedules
+  - name: Dashboard
+  - name: Reports
+  - name: Admin
+  - name: Chat
+
+paths:
+  /api/health:
+    get:
+      summary: Health check
+      tags: [System]
+      security: []
+      responses:
+        '200': { description: API and database are reachable. }
+        '500': { description: API is up but the database is unreachable. }
+
+  /api/auth/register:
+    post:
+      summary: Register a member or trainer
+      description: Rate limited to 10 requests per IP per 15 minutes. Trainer registrations return no token and require admin approval.
+      tags: [Authentication]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegisterRequest' }
+      responses:
+        '201':
+          description: Registered. Members receive a token; trainers do not.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthSuccess' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /api/auth/login:
+    post:
+      summary: Log in and receive a JWT
+      description: Rate limited to 10 requests per IP per 15 minutes.
+      tags: [Authentication]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginCredentials' }
+      responses:
+        '200':
+          description: Successful login.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthSuccess' }
+        '401':
+          description: Bad credentials, or the account is pending, suspended or rejected.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /api/auth/me:
+    get:
+      summary: Current user profile
+      tags: [Authentication]
+      responses:
+        '200': { description: The authenticated user. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /api/auth/logout:
+    post:
+      summary: Log out
+      description: JWTs are stateless; the client discards the token.
+      tags: [Authentication]
+      responses:
+        '200': { description: Acknowledged. }
+
+  /api/members:
+    get:
+      summary: List members
+      description: |
+        Roles: admin, receptionist, trainer.
+
+        A trainer's results are scoped to the members currently assigned to them in
+        `trainer_assignments`, and omit the personal-file columns (address and emergency
+        contacts). Staff see the whole membership.
+      tags: [Members]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: Paginated members.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/Member' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      summary: Create a member
+      description: 'Roles: admin, receptionist.'
+      tags: [Members]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Member' }
+      responses:
+        '201': { description: Created. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /api/members/{id}:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    get:
+      summary: Get one member
+      description: |
+        Members may only read their own record. A trainer may read a member assigned to
+        them, and receives a coaching projection without the address or emergency
+        contacts. Staff see the full record.
+      tags: [Members]
+      responses:
+        '200': { description: The member. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      summary: Replace a member
+      description: |
+        Roles: admin, receptionist, or the member themselves. Only staff may change
+        `status`. Trainers are refused.
+
+        PUT replaces the record, so `member_name` and `phone` must be present. A request
+        that omits them is rejected with 422 rather than writing NULL over the missing
+        columns. Use PATCH for a partial update.
+      tags: [Members]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Member' }
+      responses:
+        '200': { description: Updated. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      summary: Partially update a member
+      tags: [Members]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Member' }
+      responses:
+        '200': { description: Updated. }
+        '400': { description: No updatable fields supplied. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    delete:
+      summary: Delete a member
+      description: 'Roles: admin. Cascades to subscriptions, payments and attendance.'
+      tags: [Members]
+      responses:
+        '200': { description: Deleted. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/trainers:
+    get:
+      summary: List trainers
+      description: Contact details are withheld from callers with the `member` role.
+      tags: [Trainers]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Search'
+        - name: specialization
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Paginated trainers.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/Trainer' }
+    post:
+      summary: Create a trainer
+      description: 'Roles: admin.'
+      tags: [Trainers]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Trainer' }
+      responses:
+        '201': { description: Created. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/trainers/{id}:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    get:
+      summary: Get one trainer
+      tags: [Trainers]
+      responses:
+        '200': { description: The trainer. }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      summary: Replace a trainer
+      description: |
+        Roles: admin, or the trainer themselves. Only admins may change `status`.
+
+        PUT replaces the record, so `trainer_name` and `phone` must be present. A request
+        that omits them is rejected with 422 rather than writing NULL over the missing
+        columns. Use PATCH for a partial update.
+      tags: [Trainers]
+      responses:
+        '200': { description: Updated. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    patch:
+      summary: Partially update a trainer
+      tags: [Trainers]
+      responses:
+        '200': { description: Updated. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    delete:
+      summary: Delete a trainer
+      description: 'Roles: admin.'
+      tags: [Trainers]
+      responses:
+        '200': { description: Deleted. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/membership-plans:
+    get:
+      summary: List membership plans
+      description: Public — no authentication required.
+      tags: [Membership Plans]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated plans.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/MembershipPlan' }
+    post:
+      summary: Create a plan
+      description: 'Roles: admin.'
+      tags: [Membership Plans]
+      responses:
+        '201': { description: Created. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/membership-plans/{id}:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    get:
+      summary: Get one plan
+      tags: [Membership Plans]
+      security: []
+      responses:
+        '200': { description: The plan. }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      summary: Replace a plan
+      description: 'Roles: admin.'
+      tags: [Membership Plans]
+      responses:
+        '200': { description: Updated. }
+    patch:
+      summary: Partially update a plan
+      description: 'Roles: admin.'
+      tags: [Membership Plans]
+      responses:
+        '200': { description: Updated. }
+    delete:
+      summary: Delete a plan
+      description: 'Roles: admin. Refused with 409 while subscriptions reference it.'
+      tags: [Membership Plans]
+      responses:
+        '200': { description: Deleted. }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /api/subscriptions:
+    get:
+      summary: List subscriptions
+      description: 'Roles: admin, receptionist.'
+      tags: [Subscriptions]
+      responses:
+        '200': { description: All subscriptions with member and plan names. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      summary: Create a subscription and its opening payment
+      description: |
+        Roles: admin, receptionist. Runs as a single transaction: the plan is priced,
+        the subscription is created, and a matching completed payment is recorded.
+        A member may hold only one active subscription — enforced both here and by a
+        unique partial index.
+      tags: [Subscriptions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [member_id, plan_id]
+              properties:
+                member_id: { type: integer }
+                plan_id: { type: integer }
+                payment_method: { type: string, enum: [cash, card, upi, bank_transfer] }
+                notes: { type: string }
+      responses:
+        '201': { description: Subscription and payment created. }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /api/subscriptions/{id}:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    get:
+      summary: Get one subscription
+      description: Members may only read their own.
+      tags: [Subscriptions]
+      responses:
+        '200': { description: The subscription. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/subscriptions/member/{id}:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    get:
+      summary: List a member's subscriptions
+      tags: [Subscriptions]
+      responses:
+        '200': { description: Subscriptions for that member. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/payments:
+    get:
+      summary: List payments
+      description: 'Roles: admin, receptionist.'
+      tags: [Payments]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated payments.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/Payment' }
+    post:
+      summary: Record a manual payment
+      description: 'Roles: admin, receptionist.'
+      tags: [Payments]
+      responses:
+        '201': { description: Created. }
+
+  /api/payments/{id}:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    get:
+      summary: Get one payment
+      description: Members may only read their own.
+      tags: [Payments]
+      responses:
+        '200': { description: The payment. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    patch:
+      summary: Update payment status or notes
+      description: 'Roles: admin, receptionist.'
+      tags: [Payments]
+      responses:
+        '200': { description: Updated. }
+
+  /api/payments/member/{id}:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    get:
+      summary: List a member's payments
+      tags: [Payments]
+      responses:
+        '200': { description: Payments for that member. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/attendance:
+    get:
+      summary: List attendance records
+      description: 'Roles: admin, receptionist. Includes member names.'
+      tags: [Attendance]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: limit
+          in: query
+          schema: { type: integer, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: Paginated attendance.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/Attendance' }
+
+  /api/attendance/check-in:
+    post:
+      summary: Check a member in
+      description: Members check themselves in; staff pass `member_id`. Refused with 409 if an open check-in already exists today.
+      tags: [Attendance]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                member_id: { type: integer, description: Ignored for the `member` role. }
+                check_in_method: { type: string, enum: [manual, qr, biometric, app] }
+      responses:
+        '201': { description: Checked in. }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /api/attendance/check-out:
+    patch:
+      summary: Check a member out
+      tags: [Attendance]
+      responses:
+        '200': { description: Checked out. }
+        '404': { description: No open check-in for today. }
+
+  /api/attendance/member/{id}:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    get:
+      summary: List a member's attendance
+      tags: [Attendance]
+      responses:
+        '200': { description: Attendance for that member. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/exercises:
+    get:
+      summary: List exercises
+      tags: [Exercises]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200': { description: Paginated exercises. }
+    post:
+      summary: Create an exercise
+      description: 'Roles: admin, trainer.'
+      tags: [Exercises]
+      responses:
+        '201': { description: Created. }
+
+  /api/exercises/{id}:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    get:
+      summary: Get one exercise
+      tags: [Exercises]
+      responses:
+        '200': { description: The exercise. }
+    put:
+      summary: Replace an exercise
+      description: 'Roles: admin, trainer.'
+      tags: [Exercises]
+      responses:
+        '200': { description: Updated. }
+    delete:
+      summary: Delete an exercise
+      description: 'Roles: admin. Refused with 409 while a workout plan references it.'
+      tags: [Exercises]
+      responses:
+        '200': { description: Deleted. }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /api/workout-plans:
+    get:
+      summary: List workout plans
+      tags: [Workout Plans]
+      responses:
+        '200': { description: All plans. }
+    post:
+      summary: Create a workout plan with its exercises
+      description: 'Roles: admin, trainer. Plan and exercise rows are inserted in one transaction.'
+      tags: [Workout Plans]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/WorkoutPlan'
+                - type: object
+                  properties:
+                    exercises:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          exercise_id: { type: integer }
+                          day_number: { type: integer }
+                          order_number: { type: integer }
+                          sets: { type: integer }
+                          repetitions: { type: integer }
+                          duration_seconds: { type: integer }
+                          rest_seconds: { type: integer }
+                          notes: { type: string }
+      responses:
+        '201': { description: Created. }
+
+  /api/workout-plans/{id}:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    get:
+      summary: Get a plan with its exercises
+      tags: [Workout Plans]
+      responses:
+        '200': { description: The plan, including an `exercises` array. }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      summary: Delete a workout plan
+      description: 'Roles: admin, or the authoring trainer.'
+      tags: [Workout Plans]
+      responses:
+        '200': { description: Deleted. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/member-workouts:
+    post:
+      summary: Assign a workout plan to a member
+      description: 'Roles: admin, trainer.'
+      tags: [Member Workouts]
+      responses:
+        '201': { description: Assigned. }
+
+  /api/member-workouts/{id}:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    patch:
+      summary: Update assignment progress
+      description: 'Roles: admin, the assigned member, or the trainer who created the assignment.'
+      tags: [Member Workouts]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, enum: [assigned, in_progress, completed, cancelled] }
+                completion_percentage: { type: number, minimum: 0, maximum: 100 }
+                notes: { type: string }
+      responses:
+        '200': { description: Updated. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/member-workouts/member/{id}:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    get:
+      summary: List a member's assigned workouts
+      tags: [Member Workouts]
+      responses:
+        '200': { description: Assignments for that member. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/workout-sessions:
+    post:
+      summary: Log a completed workout session
+      tags: [Workout Sessions]
+      responses:
+        '201': { description: Logged. }
+
+  /api/workout-sessions/member/{id}:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    get:
+      summary: List a member's workout sessions
+      tags: [Workout Sessions]
+      responses:
+        '200': { description: Sessions for that member. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/classes:
+    get:
+      summary: List fitness classes
+      tags: [Classes]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200': { description: Paginated classes. }
+    post:
+      summary: Create a class
+      description: 'Roles: admin.'
+      tags: [Classes]
+      responses:
+        '201': { description: Created. }
+
+  /api/classes/{id}:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    get:
+      summary: Get one class
+      tags: [Classes]
+      security: []
+      responses:
+        '200': { description: The class. }
+    put:
+      summary: Replace a class
+      description: 'Roles: admin.'
+      tags: [Classes]
+      responses:
+        '200': { description: Updated. }
+    delete:
+      summary: Delete a class
+      description: 'Roles: admin. Refused with 409 while schedules reference it.'
+      tags: [Classes]
+      responses:
+        '200': { description: Deleted. }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /api/schedules:
+    get:
+      summary: List upcoming class schedules
+      description: Public. Each row includes `enrolled_count`.
+      tags: [Schedules]
+      security: []
+      responses:
+        '200':
+          description: Upcoming schedules.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/ClassSchedule' }
+    post:
+      summary: Schedule a class
+      description: 'Roles: admin.'
+      tags: [Schedules]
+      responses:
+        '201': { description: Scheduled. }
+
+  /api/schedules/{id}/enroll:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    post:
+      summary: Enrol a member in a scheduled class
+      description: |
+        Members enrol themselves; staff pass `member_id`. The schedule row is locked with
+        `SELECT ... FOR UPDATE` so two simultaneous requests cannot oversell the last seat.
+      tags: [Schedules]
+      responses:
+        '201': { description: Enrolled. }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { description: Already enrolled, or the class is full. }
+
+  /api/schedules/member/{id}:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    get:
+      summary: List a member's class bookings
+      tags: [Schedules]
+      responses:
+        '200': { description: Bookings for that member. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/dashboard/overview:
+    get:
+      summary: Headline KPIs
+      description: 'Roles: admin, receptionist.'
+      tags: [Dashboard]
+      responses:
+        '200': { description: Member, trainer, revenue and attendance counts. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/dashboard/revenue:
+    get:
+      summary: Monthly revenue for the last 12 months
+      description: 'Roles: admin. Returned oldest-first with numeric `revenue` values.'
+      tags: [Dashboard]
+      responses:
+        '200': { description: Monthly revenue series. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/reports/revenue:
+    get:
+      summary: Itemised revenue report
+      description: 'Roles: admin.'
+      tags: [Reports]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200': { description: Paginated completed payments with member and plan names. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/reports/members:
+    get:
+      summary: Member roster report
+      description: 'Roles: admin, receptionist.'
+      tags: [Reports]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200': { description: Paginated members with their active plan. }
+
+  /api/admin/users/pending-trainers:
+    get:
+      summary: List trainer accounts awaiting approval
+      description: 'Roles: admin.'
+      tags: [Admin]
+      responses:
+        '200': { description: Pending trainer registrations. }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/admin/users/{id}/approve:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    patch:
+      summary: Approve a pending trainer
+      description: 'Roles: admin. Activates the user and trainer records and writes an audit entry, in one transaction.'
+      tags: [Admin]
+      responses:
+        '200': { description: Approved. }
+        '400': { description: User is not pending approval. }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/admin/users/{id}/reject:
+    parameters: [{ $ref: '#/components/parameters/IdPath' }]
+    patch:
+      summary: Reject a pending trainer
+      description: 'Roles: admin.'
+      tags: [Admin]
+      responses:
+        '200': { description: Rejected. }
+        '400': { description: User is not pending approval. }
+
+  /api/chat:
+    post:
+      summary: Ask the AI assistant
+      description: |
+        Requires a logged-in user and is rate limited to 15 requests per account per
+        15 minutes, because every call spends money on the gym's own AI keys. Gemini is
+        tried first with Groq as a fallback. Standalone questions are cached for 10
+        minutes; follow-ups that carry `conversationHistory` are never served from cache.
+
+        When MongoDB chat history is connected, each exchange is saved under the
+        authenticated user. Send `temporary: true` for a conversation that must not be
+        kept: it is never saved and bypasses the reply cache, even with history connected.
+      tags: [Chat]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message: { type: string, minLength: 1, maxLength: 2000 }
+                conversationHistory:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: object
+                    required: [role, content]
+                    properties:
+                      role: { type: string, enum: [user, model, assistant] }
+                      content: { type: string, minLength: 1, maxLength: 4000 }
+                conversationId: { type: string, format: uuid, description: Conversation to append to; generated if omitted. }
+                requestId: { type: string, format: uuid, description: Idempotency key; a retry with the same value is not saved twice. }
+                gapBefore: { type: boolean, description: Earlier messages in this conversation were not saved. }
+                temporary:
+                  type: boolean
+                  default: false
+                  description: Temporary chat. Never saved and never cached. Must be a JSON boolean.
+      responses:
+        '200':
+          description: Assistant reply.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  response: { type: string }
+                  source: { type: string, enum: [ai, cache] }
+                  conversationId: { type: string, format: uuid }
+                  requestId: { type: string, format: uuid }
+                  persistence:
+                    type: object
+                    properties:
+                      saved: { type: boolean }
+                      temporary: { type: boolean, description: Present and true for temporary chats. }
+                      available: { type: boolean, description: Whether chat history storage is connected. }
+                      configured: { type: boolean }
+        '400': { description: Missing or oversized message. }
+        '422': { description: Invalid body, e.g. a non-boolean `temporary`. }
+        '429': { description: Rate limit exceeded. }
+        '500': { description: All AI providers failed or none is configured. }

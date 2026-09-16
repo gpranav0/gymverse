@@ -1,0 +1,123 @@
+{
+  "generated_at": "2026-09-15T02:42:06.202Z",
+  "runs": 15,
+  "volumes": {
+    "members": 50000,
+    "subscriptions": 150000,
+    "payments": 300000,
+    "attendance": 1000000
+  },
+  "configs": [
+    {
+      "key": "after16",
+      "label": "After migration 16"
+    },
+    {
+      "key": "before16",
+      "label": "Before migration 16"
+    },
+    {
+      "key": "none",
+      "label": "No supporting indexes"
+    }
+  ],
+  "queries": [
+    {
+      "key": "payments_member",
+      "label": "Member payment history",
+      "results": {
+        "after16": {
+          "median_ms": 0.367,
+          "min_ms": 0.071,
+          "max_ms": 0.511,
+          "plan": "Sort > Bitmap Heap Scan (payments) > Bitmap Index Scan (idx_payments_member_created)"
+        },
+        "before16": {
+          "median_ms": 1.654,
+          "min_ms": 0.358,
+          "max_ms": 2.204,
+          "plan": "Sort > Index Scan (idx_payments_member)"
+        },
+        "none": {
+          "median_ms": 99.052,
+          "min_ms": 53.266,
+          "max_ms": 179.1,
+          "plan": "Sort > Seq Scan (payments)"
+        }
+      }
+    },
+    {
+      "key": "subscriptions_list",
+      "label": "Subscriptions list (staff)",
+      "results": {
+        "after16": {
+          "median_ms": 2.742,
+          "min_ms": 2.394,
+          "max_ms": 3.699,
+          "plan": "Index Scan (idx_subscriptions_created_at) > Memoize > Index Scan (members_pkey)"
+        },
+        "before16": {
+          "median_ms": 147.185,
+          "min_ms": 120.23,
+          "max_ms": 395.738,
+          "plan": "Sort > Seq Scan (subscriptions) > Seq Scan (members)"
+        },
+        "none": {
+          "median_ms": 170.561,
+          "min_ms": 118.289,
+          "max_ms": 540.958,
+          "plan": "Sort > Seq Scan (subscriptions) > Seq Scan (members)"
+        }
+      }
+    },
+    {
+      "key": "attendance_log",
+      "label": "Attendance log (staff)",
+      "results": {
+        "after16": {
+          "median_ms": 8.369,
+          "min_ms": 3.985,
+          "max_ms": 12.024,
+          "plan": "Index Scan (idx_attendance_date_time) > Memoize > Index Scan (members_pkey)"
+        },
+        "before16": {
+          "median_ms": 374.443,
+          "min_ms": 249.375,
+          "max_ms": 1218.285,
+          "plan": "Sort > Seq Scan (attendance) > Seq Scan (members)"
+        },
+        "none": {
+          "median_ms": 277.291,
+          "min_ms": 243.819,
+          "max_ms": 1277.607,
+          "plan": "Sort > Seq Scan (attendance) > Seq Scan (members)"
+        }
+      }
+    },
+    {
+      "key": "member_search",
+      "label": "Member search (phone/name/email)",
+      "results": {
+        "after16": {
+          "median_ms": 2.784,
+          "min_ms": 1.113,
+          "max_ms": 4.026,
+          "plan": "Sort > Bitmap Heap Scan (members) > BitmapOr"
+        },
+        "before16": {
+          "median_ms": 225.905,
+          "min_ms": 207.496,
+          "max_ms": 265.226,
+          "plan": "Sort > Seq Scan (members)"
+        },
+        "none": {
+          "median_ms": 214.884,
+          "min_ms": 172.255,
+          "max_ms": 244.924,
+          "plan": "Sort > Seq Scan (members)"
+        }
+      }
+    }
+  ],
+  "postgres": "18.6"
+}
