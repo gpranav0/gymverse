@@ -13,7 +13,8 @@ export default function Modal({ isOpen, onClose, title, children }) {
     // dialog could scroll.
     if (!isOpen) return undefined;
     const handleEsc = (e) => {
-      if (e.key === 'Escape') onCloseRef.current();
+      // A control inside the dialog (an open Select list) may have used this Escape already.
+      if (e.key === 'Escape' && !e.defaultPrevented) onCloseRef.current();
     };
     const previousOverflow = document.body.style.overflow;
     document.addEventListener('keydown', handleEsc);

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getMembers } from '../../services/memberService';
 import { getErrorMessage } from '../../services/api';
+import Select from '../ui/Select';
 
 /**
  * Log a completed workout. A member logs their own; a trainer logs one for a client on
@@ -51,20 +52,20 @@ export default function WorkoutSessionForm({ plans = [], onSubmit, onCancel, loa
       {forClient && (
         <label className="flex flex-col gap-1.5">
           <span className="label-caps">Member</span>
-          <select required name="member_id" value={form.member_id} onChange={setField} className="field text-sm">
+          <Select required name="member_id" value={form.member_id} onChange={setField} className="text-sm">
             <option value="" disabled>-- Select a member --</option>
             {members.map((m) => <option key={m.member_id} value={m.member_id}>{m.member_name}</option>)}
-          </select>
+          </Select>
           {members.length === 0 && <span className="text-xs text-ink-muted">No members are assigned to you yet.</span>}
         </label>
       )}
 
       <label className="flex flex-col gap-1.5">
         <span className="label-caps">Workout plan (optional)</span>
-        <select name="workout_plan_id" value={form.workout_plan_id} onChange={setField} className="field text-sm">
+        <Select name="workout_plan_id" value={form.workout_plan_id} onChange={setField} className="text-sm">
           <option value="">Free training</option>
           {plans.map((p) => <option key={p.workout_plan_id} value={p.workout_plan_id}>{p.plan_name}</option>)}
-        </select>
+        </Select>
       </label>
 
       <div className="grid grid-cols-2 gap-4">

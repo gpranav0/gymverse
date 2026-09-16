@@ -3,6 +3,7 @@ import { getMembers } from '../../services/memberService';
 import { getTrainers } from '../../services/trainerService';
 import { getErrorMessage } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import Select from '../ui/Select';
 
 export default function AssignWorkoutForm({ plan, onSubmit, onCancel, loading }) {
   const { user } = useAuth();
@@ -69,12 +70,12 @@ export default function AssignWorkoutForm({ plan, onSubmit, onCancel, loading })
 
       <label className="flex flex-col gap-1.5">
         <span className="label-caps">Select member *</span>
-        <select
+        <Select
           required
           name="member_id"
           value={selectedMember}
           onChange={(e) => setSelectedMember(e.target.value)}
-          className="field text-sm"
+          className="text-sm"
         >
           <option value="" disabled>-- Select a member --</option>
           {members.map(m => (
@@ -82,24 +83,24 @@ export default function AssignWorkoutForm({ plan, onSubmit, onCancel, loading })
               {m.member_name} ({m.email})
             </option>
           ))}
-        </select>
+        </Select>
       </label>
 
       {needsTrainer && (
         <label className="flex flex-col gap-1.5">
           <span className="label-caps">Assigned by trainer *</span>
-          <select
+          <Select
             required
             name="assigned_by_trainer_id"
             value={selectedTrainer}
             onChange={(e) => setSelectedTrainer(e.target.value)}
-            className="field text-sm"
+            className="text-sm"
           >
             <option value="" disabled>-- Select a trainer --</option>
             {trainers.map((t) => (
               <option key={t.trainer_id} value={t.trainer_id}>{t.trainer_name}</option>
             ))}
-          </select>
+          </Select>
         </label>
       )}
 

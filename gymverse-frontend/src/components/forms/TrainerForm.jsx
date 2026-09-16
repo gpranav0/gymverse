@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Select from '../ui/Select';
 
 export default function TrainerForm({ initialData, onSubmit, onCancel, loading }) {
   const [formData, setFormData] = useState({
@@ -79,11 +80,11 @@ export default function TrainerForm({ initialData, onSubmit, onCancel, loading }
         </label>
         <label className="flex flex-col gap-1.5">
           <span className="label-caps">Shift</span>
-          <select name="shift" value={formData.shift} onChange={handleChange} className="field text-sm">
+          <Select name="shift" value={formData.shift} onChange={handleChange} className="text-sm">
             <option value="Morning">Morning</option>
             <option value="Evening">Evening</option>
             <option value="Full-Day">Full-Day</option>
-          </select>
+          </Select>
         </label>
       </div>
 
@@ -94,10 +95,10 @@ export default function TrainerForm({ initialData, onSubmit, onCancel, loading }
 
       <label className="flex flex-col gap-1.5">
         <span className="label-caps">Status</span>
-        <select name="status" value={formData.status} onChange={handleChange} className="field text-sm">
+        <Select name="status" value={formData.status} onChange={handleChange} className="text-sm">
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
-        </select>
+        </Select>
       </label>
 
       <div className="mt-2 flex justify-end gap-3 border-t border-white/10 pt-4">

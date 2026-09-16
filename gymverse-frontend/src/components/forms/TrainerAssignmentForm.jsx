@@ -3,6 +3,7 @@ import { getMembers } from '../../services/memberService';
 import { getTrainers } from '../../services/trainerService';
 import { getErrorMessage } from '../../services/api';
 import { todayLocal } from '../../utils/dates';
+import Select from '../ui/Select';
 
 export default function TrainerAssignmentForm({ onSubmit, onCancel, loading }) {
   const [members, setMembers] = useState([]);
@@ -51,24 +52,24 @@ export default function TrainerAssignmentForm({ onSubmit, onCancel, loading }) {
 
       <label className="flex flex-col gap-1.5">
         <span className="label-caps">Member</span>
-        <select required name="member_id" value={form.member_id} onChange={setField} className="field text-sm">
+        <Select required name="member_id" value={form.member_id} onChange={setField} className="text-sm">
           <option value="" disabled>-- Select a member --</option>
           {members.map((m) => (
             <option key={m.member_id} value={m.member_id}>{m.member_name} ({m.email})</option>
           ))}
-        </select>
+        </Select>
       </label>
 
       <label className="flex flex-col gap-1.5">
         <span className="label-caps">Trainer</span>
-        <select required name="trainer_id" value={form.trainer_id} onChange={setField} className="field text-sm">
+        <Select required name="trainer_id" value={form.trainer_id} onChange={setField} className="text-sm">
           <option value="" disabled>-- Select a trainer --</option>
           {trainers.map((t) => (
             <option key={t.trainer_id} value={t.trainer_id}>
               {t.trainer_name}{t.specialization ? ` — ${t.specialization}` : ''}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
 
       <div className="grid grid-cols-2 gap-4">

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Select from '../ui/Select';
 
 export default function PlanForm({ initialData, onSubmit, onCancel, loading }) {
   const [formData, setFormData] = useState({
@@ -58,7 +59,7 @@ export default function PlanForm({ initialData, onSubmit, onCancel, loading }) {
       <div className="grid grid-cols-2 gap-4">
         <label className="flex flex-col gap-1.5">
           <span className="label-caps">Access Level</span>
-          <select name="access_level" value={formData.access_level || ''} onChange={handleChange} className="field text-sm">
+          <Select name="access_level" value={formData.access_level || ''} onChange={handleChange} className="text-sm">
             {/* A plan with no level, or one set outside this form, must still show its real value. */}
             {!formData.access_level && <option value="">Not set</option>}
             {formData.access_level && !['basic', 'premium', 'vip'].includes(formData.access_level) && (
@@ -67,14 +68,14 @@ export default function PlanForm({ initialData, onSubmit, onCancel, loading }) {
             <option value="basic">Basic</option>
             <option value="premium">Premium</option>
             <option value="vip">VIP</option>
-          </select>
+          </Select>
         </label>
         <label className="flex flex-col gap-1.5">
           <span className="label-caps">Status</span>
-          <select name="status" value={formData.status} onChange={handleChange} className="field text-sm">
+          <Select name="status" value={formData.status} onChange={handleChange} className="text-sm">
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
-          </select>
+          </Select>
         </label>
       </div>
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getTrainers } from '../../services/trainerService';
 import { getErrorMessage } from '../../services/api';
+import Select from '../ui/Select';
 
 export default function WorkoutPlanForm({ onSubmit, onCancel, loading }) {
   const { user } = useAuth();
@@ -55,14 +56,14 @@ export default function WorkoutPlanForm({ onSubmit, onCancel, loading }) {
       {needsTrainer && (
         <label className="flex flex-col gap-1.5">
           <span className="label-caps">Authoring trainer *</span>
-          <select required name="trainer_id" value={formData.trainer_id} onChange={handleChange} className="field text-sm">
+          <Select required name="trainer_id" value={formData.trainer_id} onChange={handleChange} className="text-sm">
             <option value="" disabled>-- Select a trainer --</option>
             {trainers.map((t) => (
               <option key={t.trainer_id} value={t.trainer_id}>
                 {t.trainer_name}{t.specialization ? ` — ${t.specialization}` : ''}
               </option>
             ))}
-          </select>
+          </Select>
           {trainerError && <span className="text-xs text-[#ffc2cc]">{trainerError}</span>}
         </label>
       )}
@@ -79,11 +80,11 @@ export default function WorkoutPlanForm({ onSubmit, onCancel, loading }) {
         </label>
         <label className="flex flex-col gap-1.5">
           <span className="label-caps">Difficulty level</span>
-          <select name="difficulty_level" value={formData.difficulty_level} onChange={handleChange} className="field text-sm">
+          <Select name="difficulty_level" value={formData.difficulty_level} onChange={handleChange} className="text-sm">
             <option value="beginner">Beginner</option>
             <option value="intermediate">Intermediate</option>
             <option value="advanced">Advanced</option>
-          </select>
+          </Select>
         </label>
       </div>
 

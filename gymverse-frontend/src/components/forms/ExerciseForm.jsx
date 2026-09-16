@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../ui/Select';
 
 const FIELDS = ['exercise_name', 'muscle_group', 'secondary_muscle_group', 'equipment_required', 'difficulty_level', 'description', 'instructions'];
 
@@ -37,11 +38,11 @@ export default function ExerciseForm({ initialData, onSubmit, onCancel, loading 
         </label>
         <label className="flex flex-col gap-1.5">
           <span className="label-caps">Difficulty</span>
-          <select name="difficulty_level" value={form.difficulty_level} onChange={setField} className="field text-sm">
+          <Select name="difficulty_level" value={form.difficulty_level} onChange={setField} className="text-sm">
             <option value="beginner">Beginner</option>
             <option value="intermediate">Intermediate</option>
             <option value="advanced">Advanced</option>
-          </select>
+          </Select>
         </label>
       </div>
       <label className="flex flex-col gap-1.5">

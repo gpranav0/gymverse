@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../ui/Select';
 
 const blank = { class_name: '', description: '', difficulty_level: '', duration_minutes: 45, status: 'active' };
 
@@ -37,12 +38,12 @@ export default function ClassForm({ initialData, onSubmit, onCancel, loading }) 
       <div className="grid grid-cols-3 gap-4">
         <label className="flex flex-col gap-1.5">
           <span className="label-caps">Difficulty</span>
-          <select name="difficulty_level" value={form.difficulty_level} onChange={setField} className="field text-sm">
+          <Select name="difficulty_level" value={form.difficulty_level} onChange={setField} className="text-sm">
             <option value="">Any level</option>
             <option value="beginner">Beginner</option>
             <option value="intermediate">Intermediate</option>
             <option value="advanced">Advanced</option>
-          </select>
+          </Select>
         </label>
         <label className="flex flex-col gap-1.5">
           <span className="label-caps">Minutes</span>
@@ -50,10 +51,10 @@ export default function ClassForm({ initialData, onSubmit, onCancel, loading }) 
         </label>
         <label className="flex flex-col gap-1.5">
           <span className="label-caps">Status</span>
-          <select name="status" value={form.status} onChange={setField} className="field text-sm">
+          <Select name="status" value={form.status} onChange={setField} className="text-sm">
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
-          </select>
+          </Select>
         </label>
       </div>
       <div className="mt-2 flex justify-end gap-3 border-t border-white/10 pt-4">

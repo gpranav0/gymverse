@@ -9,6 +9,7 @@ import GlassTable, { IdentityCell } from '../../components/ui/GlassTable';
 import { Pill } from '../../components/ui/Glass';
 import { PageHeader, ErrorNote, SuccessNote, EmptyState, LoadingTable } from '../../components/ui/States';
 import TrainerAssignmentForm from '../../components/forms/TrainerAssignmentForm';
+import Select from '../../components/ui/Select';
 
 const PAGE_SIZE = 25;
 const STATUS_PILL = { active: 'active', completed: 'neutral', cancelled: 'expired' };
@@ -124,16 +125,16 @@ export default function TrainerAssignments() {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader title="Trainer rosters" subtitle={meta ? `${meta.total} ${status === 'all' ? '' : status} assignment${meta.total === 1 ? '' : 's'}` : 'Which trainer looks after which member'}>
-        <select aria-label="Filter by status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className="field py-2.5 text-sm">
+        <Select aria-label="Filter by status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className="py-2.5 text-sm">
           <option value="active">Active</option>
           <option value="completed">Completed</option>
           <option value="cancelled">Cancelled</option>
           <option value="all">All</option>
-        </select>
-        <select aria-label="Filter by trainer" value={trainerId} onChange={(e) => { setTrainerId(e.target.value); setPage(1); }} className="field py-2.5 text-sm">
+        </Select>
+        <Select aria-label="Filter by trainer" value={trainerId} onChange={(e) => { setTrainerId(e.target.value); setPage(1); }} className="py-2.5 text-sm">
           <option value="">All trainers</option>
           {trainers.map((t) => <option key={t.trainer_id} value={t.trainer_id}>{t.trainer_name}</option>)}
-        </select>
+        </Select>
         <button type="button" onClick={() => { setFormError(null); setIsModalOpen(true); }} className="btn-primary text-[13.5px]">
           + Assign trainer
         </button>

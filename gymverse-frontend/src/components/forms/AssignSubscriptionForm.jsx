@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getMembers } from '../../services/memberService';
 import { getErrorMessage } from '../../services/api';
+import Select from '../ui/Select';
 
 export default function AssignSubscriptionForm({ plan, onSubmit, onCancel, loading }) {
   const [members, setMembers] = useState([]);
@@ -47,11 +48,11 @@ export default function AssignSubscriptionForm({ plan, onSubmit, onCancel, loadi
 
       <label className="flex flex-col gap-1.5">
         <span className="label-caps">Select member *</span>
-        <select
+        <Select
           required
           value={selectedMember}
           onChange={(e) => setSelectedMember(e.target.value)}
-          className="field text-sm"
+          className="text-sm"
         >
           <option value="" disabled>-- Select a member --</option>
           {members.map(m => (
@@ -59,17 +60,17 @@ export default function AssignSubscriptionForm({ plan, onSubmit, onCancel, loadi
               {m.member_name} ({m.email})
             </option>
           ))}
-        </select>
+        </Select>
       </label>
 
       <label className="flex flex-col gap-1.5">
         <span className="label-caps">Payment method *</span>
-        <select required value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="field text-sm">
+        <Select required value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="text-sm">
           <option value="cash">Cash</option>
           <option value="card">Card</option>
           <option value="upi">UPI</option>
           <option value="bank_transfer">Bank transfer</option>
-        </select>
+        </Select>
       </label>
 
       <p className="m-0 text-xs text-ink-muted">

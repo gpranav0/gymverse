@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Select from '../ui/Select';
 
 export default function MemberForm({ initialData, onSubmit, onCancel, loading }) {
   const [formData, setFormData] = useState({
@@ -65,11 +66,11 @@ export default function MemberForm({ initialData, onSubmit, onCancel, loading })
         <div className="grid grid-cols-2 gap-4">
           <label className="flex flex-col gap-1.5">
             <span className="label-caps">Gender</span>
-            <select name="gender" value={formData.gender} onChange={handleChange} className="field text-sm">
+            <Select name="gender" value={formData.gender} onChange={handleChange} className="text-sm">
               <option value="Male">Male</option>
               <option value="Female">Female</option>
               <option value="Other">Other</option>
-            </select>
+            </Select>
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="label-caps">Date of Birth</span>
@@ -96,12 +97,12 @@ export default function MemberForm({ initialData, onSubmit, onCancel, loading })
 
       <label className="flex flex-col gap-1.5">
         <span className="label-caps">Status</span>
-        <select name="status" value={formData.status} onChange={handleChange} className="field text-sm">
+        <Select name="status" value={formData.status} onChange={handleChange} className="text-sm">
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
           <option value="suspended">Suspended</option>
           <option value="expired">Expired</option>
-        </select>
+        </Select>
       </label>
 
       <div className="mt-2 flex justify-end gap-3 border-t border-white/10 pt-4">

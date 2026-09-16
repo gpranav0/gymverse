@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { todayLocal } from '../../utils/dates';
+import Select from '../ui/Select';
 
 /** Create a new session of a class. `classes` and `trainers` should already be active-only. */
 export default function ScheduleForm({ classes, trainers, onSubmit, onCancel, loading }) {
@@ -32,17 +33,17 @@ export default function ScheduleForm({ classes, trainers, onSubmit, onCancel, lo
       <div className="grid grid-cols-2 gap-4">
         <label className="flex flex-col gap-1.5">
           <span className="label-caps">Class</span>
-          <select required name="class_id" value={form.class_id} onChange={setField} className="field text-sm">
+          <Select required name="class_id" value={form.class_id} onChange={setField} className="text-sm">
             <option value="" disabled>-- Select a class --</option>
             {classes.map((c) => <option key={c.class_id} value={c.class_id}>{c.class_name}</option>)}
-          </select>
+          </Select>
         </label>
         <label className="flex flex-col gap-1.5">
           <span className="label-caps">Trainer</span>
-          <select required name="trainer_id" value={form.trainer_id} onChange={setField} className="field text-sm">
+          <Select required name="trainer_id" value={form.trainer_id} onChange={setField} className="text-sm">
             <option value="" disabled>-- Select a trainer --</option>
             {trainers.map((t) => <option key={t.trainer_id} value={t.trainer_id}>{t.trainer_name}</option>)}
-          </select>
+          </Select>
         </label>
       </div>
       <div className="grid grid-cols-3 gap-4">

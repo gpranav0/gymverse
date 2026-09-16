@@ -5,6 +5,7 @@ import { getErrorMessage } from '../../services/api';
 import AppBackdrop from '../../components/ui/AppBackdrop';
 import { useGlassTheme } from '../../components/ui/Glass';
 import { Dumbbell } from 'lucide-react';
+import Select from '../../components/ui/Select';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -150,10 +151,10 @@ export default function Register() {
 
             <label className="flex flex-col gap-1.5">
               <span className="label-caps">I am joining as</span>
-              <select name="role_name" className="field text-sm" value={formData.role_name} onChange={handleChange}>
+              <Select name="role_name" className="text-sm" value={formData.role_name} onChange={handleChange}>
                 <option value="member">Member</option>
                 <option value="trainer">Trainer</option>
-              </select>
+              </Select>
             </label>
 
             {formData.role_name === 'trainer' && (

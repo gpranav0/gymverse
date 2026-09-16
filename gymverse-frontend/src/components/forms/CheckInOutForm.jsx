@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getMembers } from '../../services/memberService';
 import { getErrorMessage } from '../../services/api';
+import Select from '../ui/Select';
 
 export default function CheckInOutForm({ onAction, onCancel, loading }) {
   const [members, setMembers] = useState([]);
@@ -29,11 +30,11 @@ export default function CheckInOutForm({ onAction, onCancel, loading }) {
     <div className="flex flex-col gap-4">
       <label className="flex flex-col gap-1.5">
         <span className="label-caps">Select member *</span>
-        <select
+        <Select
           required
           value={selectedMember}
           onChange={(e) => setSelectedMember(e.target.value)}
-          className="field text-sm"
+          className="text-sm"
         >
           <option value="" disabled>-- Select a member --</option>
           {members.map(m => (
@@ -41,7 +42,7 @@ export default function CheckInOutForm({ onAction, onCancel, loading }) {
               {m.member_name} ({m.email})
             </option>
           ))}
-        </select>
+        </Select>
       </label>
 
       <div className="mt-2 flex justify-between gap-3 border-t border-white/10 pt-4">

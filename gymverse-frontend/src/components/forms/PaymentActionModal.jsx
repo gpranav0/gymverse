@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fmtDate } from '../../utils/dates';
+import Select from '../ui/Select';
 
 export default function PaymentActionModal({ payment, onSubmit, onCancel, loading }) {
   const [status, setStatus] = useState('pending');
@@ -31,18 +32,18 @@ export default function PaymentActionModal({ payment, onSubmit, onCancel, loadin
       <label className="flex flex-col gap-1.5">
         <span className="label-caps">Update status</span>
         {/* Every PAYMENT_STATUSES value the API accepts; a missing one rendered a blank select. */}
-        <select
+        <Select
           required
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="field text-sm"
+          className="text-sm"
         >
           <option value="pending">Pending</option>
           <option value="completed">Completed</option>
           <option value="failed">Failed</option>
           <option value="refunded">Refunded</option>
           <option value="partially_refunded">Partially refunded</option>
-        </select>
+        </Select>
       </label>
 
       <div className="mt-2 flex justify-end gap-3 border-t border-white/10 pt-4">
