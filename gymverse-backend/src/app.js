@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit');
 const YAML = require('yamljs');
 const path = require('path');
 const fs = require('fs');
+const { expandDevelopmentOrigins } = require('./config/corsOrigins');
 
 const app = express();
 
@@ -35,10 +36,11 @@ app.use(helmet());
 
 // Restrict CORS to known origins. CORS_ORIGIN takes a comma-separated list;
 // with no value set we fall back to the local Vite dev server.
-const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
+const configuredOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
   .split(',')
   .map((o) => o.trim())
   .filter(Boolean);
+const allowedOrigins = expandDevelopmentOrigins(configuredOrigins, process.env.NODE_ENV);
 
 // A wildcard origin with credentials enabled means any site can make authenticated
 // requests on a visitor's behalf. Refuse to start in that configuration rather than

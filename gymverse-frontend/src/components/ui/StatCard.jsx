@@ -1,12 +1,12 @@
 import { GlassPanel, useCountUp } from './Glass';
 
 const GLOWS = {
-  blue: 'radial-gradient(circle, rgb(77 141 255 / .85), transparent 68%)',
-  green: 'radial-gradient(circle, rgb(52 211 153 / .8), transparent 68%)',
-  violet: 'radial-gradient(circle, rgb(167 139 250 / .8), transparent 68%)',
-  amber: 'radial-gradient(circle, rgb(251 191 36 / .75), transparent 68%)',
+  blue: 'radial-gradient(circle, rgb(199 255 53 / .55), transparent 68%)',
+  green: 'radial-gradient(circle, rgb(110 211 146 / .6), transparent 68%)',
+  violet: 'radial-gradient(circle, rgb(255 92 53 / .5), transparent 68%)',
+  amber: 'radial-gradient(circle, rgb(255 180 78 / .6), transparent 68%)',
 };
-const TINTS = { blue: '#9ec2ff', green: '#8ff0cd', violet: '#d8ccff', amber: '#ffdf9e' };
+const TINTS = { blue: '#c7ff35', green: '#8ff0cd', violet: '#ff937b', amber: '#ffdf9e' };
 const TRENDS = {
   up: ['rgb(52 211 153 / .16)', 'rgb(52 211 153 / .4)', '#8ff0cd'],
   warn: ['rgb(251 191 36 / .16)', 'rgb(251 191 36 / .42)', '#ffdf9e'],

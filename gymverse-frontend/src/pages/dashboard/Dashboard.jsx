@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 import { getDashboardOverview, getRevenueData, getTrainerDashboard, getMemberDashboard } from '../../services/dashboardService';
 import { getErrorMessage } from '../../services/api';
 import { fmtDate, fmtTime, parseDate } from '../../utils/dates';
@@ -9,6 +10,12 @@ import { Users, Activity, DollarSign, CalendarCheck, Dumbbell, ShieldCheck, Cred
 
 const pct = (part, whole) => (whole ? Math.round((part / whole) * 100) : 0);
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+const roleIntro = {
+  admin: { eyebrow: 'CLUB CONTROL', headline: 'Lead the club.', detail: 'Your people, operations, and performance at a glance.', actions: [['View reports', '/reports'], ['Manage classes', '/class-management']] },
+  receptionist: { eyebrow: 'FRONT DESK', headline: 'Keep things moving.', detail: 'A clear view of the floor and the members who need you.', actions: [['Find members', '/members'], ['Check attendance', '/attendance']] },
+  trainer: { eyebrow: 'COACHING SPACE', headline: 'Make every session count.', detail: 'Your roster, plans, and classes in one place.', actions: [['Open workouts', '/workouts'], ['View classes', '/classes']] },
+  member: { eyebrow: 'YOUR TRAINING', headline: 'What will you do today?', detail: 'Your training, classes, and progress start here.', actions: [['My workouts', '/workouts'], ['Explore classes', '/classes']] },
+};
 
 /**
  * Role-aware dashboard. Every figure comes from the API; the trainer and member views
@@ -75,6 +82,7 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col gap-4.5">
+      <section className="dashboard-welcome"><div><p>{roleIntro[role]?.eyebrow}</p><h1>{roleIntro[role]?.headline}</h1><span>{roleIntro[role]?.detail}</span><div className="dashboard-welcome-actions">{roleIntro[role]?.actions.map(([label, href]) => <Link key={href} to={href}>{label}</Link>)}</div></div></section>
       <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(210px,1fr))]">
         {role === 'admin' && overview && (
           <>

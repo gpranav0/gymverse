@@ -1866,3 +1866,12 @@ INSERT INTO system_settings (setting_key, setting_value) VALUES
 ('maximum_class_capacity', '30'),
 ('default_attendance_method', 'qr'),
 ('maximum_booking_days', '14');
+
+-- Demo sessions stay upcoming on fresh installs. Keep these after historical
+-- bookings so the fixed schedule IDs referenced above remain unchanged.
+INSERT INTO class_schedules (class_id, trainer_id, class_date, start_time, end_time, capacity, room) VALUES
+(1, 1, CURRENT_DATE + 1, '07:00:00', '08:00:00', 20, 'Studio A'),
+(2, 2, CURRENT_DATE + 2, '18:00:00', '19:00:00', 20, 'Studio B'),
+(3, 3, CURRENT_DATE + 3, '07:00:00', '08:00:00', 20, 'Studio A'),
+(4, 4, CURRENT_DATE + 4, '18:00:00', '19:00:00', 20, 'Studio B'),
+(5, 5, CURRENT_DATE + 5, '09:00:00', '10:00:00', 20, 'Studio A');

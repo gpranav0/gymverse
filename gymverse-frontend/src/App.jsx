@@ -12,6 +12,7 @@ import Login from './pages/auth/Login';
 const DashboardLayout = lazy(() => import('./layouts/DashboardLayout'));
 const ChatWidget = lazy(() => import('./components/ChatWidget'));
 const Register = lazy(() => import('./pages/auth/Register'));
+const Landing = lazy(() => import('./pages/public/Landing'));
 const Dashboard = lazy(() => import('./pages/dashboard/Dashboard'));
 const MembersList = lazy(() => import('./pages/members/MembersList'));
 const MemberProfile = lazy(() => import('./pages/members/MemberProfile'));
@@ -57,6 +58,7 @@ export default function App() {
         <ChatLauncher />
         <Suspense fallback={<PageFallback />}>
           <Routes>
+            <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -96,7 +98,7 @@ export default function App() {
                 </Route>
               </Route>
             </Route>
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

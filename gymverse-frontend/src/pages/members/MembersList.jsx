@@ -3,7 +3,7 @@ import { getMembers, getMemberById, deleteMember, createMember, updateMember } f
 import { getErrorMessage } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { Trash2, Edit, Eye, Search } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Modal from '../../components/ui/Modal';
 import Pagination from '../../components/ui/Pagination';
 import MemberForm from '../../components/forms/MemberForm';
@@ -15,11 +15,13 @@ const PAGE_SIZE = 20;
 
 export default function MembersList() {
   const { user } = useAuth();
+  const location = useLocation();
+  const initialSearch = new URLSearchParams(location.search).get('search') || '';
   const [members, setMembers] = useState([]);
   const [meta, setMeta] = useState(null);
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
-  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState(initialSearch);
+  const [searchInput, setSearchInput] = useState(initialSearch);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 

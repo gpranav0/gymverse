@@ -1,32 +1,15 @@
-import { Dumbbell } from 'lucide-react';
-import AppBackdrop from './AppBackdrop';
+import { Dumbbell, ArrowUpRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useGlassTheme } from './Glass';
 
 /** The glass card used by every signed-out page (sign in, register, password, email). */
 export default function AuthShell({ title, subtitle, maxWidth = 420, children }) {
-  useGlassTheme({ accent: '#4d8dff', blur: 18 });
+  useGlassTheme({ accent: '#c7ff35', blur: 12 });
 
   return (
-    <div className="relative grid min-h-screen place-items-center px-6 py-10 text-ink">
-      <AppBackdrop />
-      <div className="glass w-full px-8 py-9" style={{ maxWidth, animation: 'var(--animate-screen-in)' }}>
-        <div className="mb-7 flex items-center gap-2.5">
-          <div
-            className="grid h-[34px] w-[34px] place-items-center rounded-[10px]"
-            style={{
-              background: 'linear-gradient(150deg, var(--gv-accent), #7c5cff)',
-              boxShadow: '0 8px 22px -8px var(--gv-accent)',
-            }}
-          >
-            <Dumbbell size={19} color="#fff" />
-          </div>
-          <span className="font-display text-[19px] font-bold tracking-[-.2px]">GymVerse</span>
-        </div>
-
-        <h1 className="m-0 mb-1.5 font-display text-[27px] font-bold tracking-[-.6px]">{title}</h1>
-        {subtitle && <p className="m-0 mb-6.5 text-sm text-ink-soft">{subtitle}</p>}
-        {children}
-      </div>
+    <div className="auth-layout">
+      <div className="auth-showcase"><Link to="/" className="auth-showcase-logo"><Dumbbell size={22} /> GYMVERSE<span>.</span></Link><div><p>THE WORK STARTS HERE</p><h2>EVERY REP.<br />EVERY MILE.<br /><em>EVERY DAY.</em></h2><span>More than a membership. A place to find your momentum.</span></div></div>
+      <div className="auth-form-side"><Link to="/" className="auth-back-home">Back to the club <ArrowUpRight size={16} /></Link><div className="auth-form-wrap" style={{ maxWidth }}><div className="auth-mobile-brand"><Dumbbell size={21} /> GYMVERSE<span>.</span></div><p className="landing-eyebrow">WELCOME TO GYMVERSE</p><h1>{title}</h1>{subtitle && <p className="auth-subtitle">{subtitle}</p>}{children}</div></div>
     </div>
   );
 }

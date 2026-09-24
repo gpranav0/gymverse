@@ -2,9 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getErrorMessage } from '../../services/api';
-import AppBackdrop from '../../components/ui/AppBackdrop';
-import { useGlassTheme } from '../../components/ui/Glass';
-import { Dumbbell } from 'lucide-react';
+import AuthShell from '../../components/ui/AuthShell';
 import Select from '../../components/ui/Select';
 
 export default function Register() {
@@ -23,10 +21,10 @@ export default function Register() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { register } = useAuth();
   const navigate = useNavigate();
-  useGlassTheme({ accent: '#4d8dff', blur: 18 });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -81,24 +79,7 @@ export default function Register() {
   };
 
   return (
-    <div className="relative grid min-h-screen place-items-center px-6 py-10 text-ink">
-      <AppBackdrop />
-      <div className="glass w-full max-w-[560px] px-8 py-9" style={{ animation: 'var(--animate-screen-in)' }}>
-        <div className="mb-7 flex items-center gap-2.5">
-          <div
-            className="grid h-[34px] w-[34px] place-items-center rounded-[10px]"
-            style={{
-              background: 'linear-gradient(150deg, var(--gv-accent), #7c5cff)',
-              boxShadow: '0 8px 22px -8px var(--gv-accent)',
-            }}
-          >
-            <Dumbbell size={19} color="#fff" />
-          </div>
-          <span className="font-display text-[19px] font-bold tracking-[-.2px]">GymVerse</span>
-        </div>
-
-        <h1 className="m-0 mb-1.5 font-display text-[27px] font-bold tracking-[-.6px]">Join GymVerse</h1>
-        <p className="m-0 mb-6.5 text-sm text-ink-soft">Create an account to book classes and track your progress.</p>
+    <AuthShell title="Join GymVerse" subtitle="Create an account to book classes and track your progress." maxWidth={560}>
 
         {error && (
           <div
@@ -173,13 +154,15 @@ export default function Register() {
             <div className="grid grid-cols-2 gap-3.5">
               <label className="flex flex-col gap-1.5">
                 <span className="label-caps">Password</span>
-                <input required type="password" name="password" className="field text-sm" value={formData.password} onChange={handleChange} />
+                <input required type={showPassword ? 'text' : 'password'} name="password" className="field text-sm" value={formData.password} onChange={handleChange} autoComplete="new-password" aria-describedby="password-requirements" />
               </label>
               <label className="flex flex-col gap-1.5">
                 <span className="label-caps">Confirm password</span>
-                <input required type="password" name="confirmPassword" className="field text-sm" value={formData.confirmPassword} onChange={handleChange} />
+                <input required type={showPassword ? 'text' : 'password'} name="confirmPassword" className="field text-sm" value={formData.confirmPassword} onChange={handleChange} autoComplete="new-password" />
               </label>
             </div>
+            <p id="password-requirements" className="m-0 text-xs text-ink-muted">Use at least 8 characters, including a letter and a number.</p>
+            <label className="flex items-center gap-2 text-xs text-ink-soft"><input type="checkbox" checked={showPassword} onChange={event => setShowPassword(event.target.checked)} /> Show passwords</label>
 
             <button type="submit" disabled={loading} className="btn-primary mt-2 py-3.5 text-sm disabled:opacity-60">
               {loading ? 'Creating account…' : 'Create account'}
@@ -192,7 +175,6 @@ export default function Register() {
             Already have an account? <Link to="/login">Sign in</Link>
           </p>
         )}
-      </div>
-    </div>
+    </AuthShell>
   );
 }

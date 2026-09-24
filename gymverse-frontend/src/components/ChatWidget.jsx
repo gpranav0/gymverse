@@ -8,7 +8,7 @@ import ConversationPicker from './ConversationPicker';
 // model and paid for. Send the most recent turns rather than the whole transcript.
 const MAX_HISTORY_TURNS = 20;
 
-const WELCOME = 'Hi! I am the GymVerse AI Assistant. How can I help you today?';
+const WELCOME = 'Hi! I’m GymVerse Coach. What would you like to work on today?';
 const TEMPORARY_WELCOME = 'This is a temporary chat. Nothing here is saved to your history, and it disappears when you reload, start a new chat, or sign out.';
 // `local` marks text the widget wrote itself (greetings, error notes). The model never said
 // it, so it is never sent back as conversation history.
@@ -139,7 +139,7 @@ function AccountChat() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-40 text-ink sm:bottom-6 sm:right-6">
+    <div className="gymverse-chat fixed bottom-4 right-4 z-40 text-ink sm:bottom-6 sm:right-6">
       {/* Chat Button */}
       {!isOpen && (
         <button
@@ -150,7 +150,7 @@ function AccountChat() {
           aria-controls="gymverse-chat"
         >
           <MessageSquare size={20} />
-          <span className="font-display text-sm">Ask GymVerse</span>
+          <span className="font-display text-sm">GymVerse Coach</span>
         </button>
       )}
 
@@ -159,9 +159,9 @@ function AccountChat() {
         <section
           id="gymverse-chat"
           aria-labelledby="gymverse-chat-title"
-          className="glass flex h-[520px] max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] flex-col overflow-hidden sm:w-[380px]"
+          className="gymverse-chat-window glass flex h-[520px] max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] flex-col overflow-hidden sm:w-[380px]"
           style={{
-            background: 'linear-gradient(155deg, rgb(22 32 53 / .97), rgb(7 10 20 / .95))',
+            background: 'linear-gradient(155deg, #1a211c, #0b1010)',
             animation: 'var(--animate-rise-in)',
           }}
         >
@@ -169,13 +169,13 @@ function AccountChat() {
           <div className="flex shrink-0 items-center gap-3 border-b border-white/10 px-5 py-4">
             <div
               className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/15"
-              style={{ background: 'linear-gradient(150deg, var(--gv-accent), #7c5cff)', boxShadow: '0 8px 22px -8px var(--gv-accent)' }}
+              style={{ background: 'var(--gv-accent)', boxShadow: '0 8px 22px -8px var(--gv-accent)' }}
             >
-              <Sparkles size={19} className="text-white" />
+              <Sparkles size={19} className="text-[#080a0d]" />
             </div>
             <div className="min-w-0 flex-1">
-              <h2 id="gymverse-chat-title" className="m-0 font-display text-[17px] font-semibold tracking-[-.2px]">GymVerse Assistant</h2>
-              <p className="mt-0.5 text-xs text-ink-muted">Your gym & fitness companion</p>
+              <h2 id="gymverse-chat-title" className="m-0 font-display text-[21px] font-bold tracking-[-.2px]">GymVerse Coach</h2>
+              <p className="mt-0.5 text-xs text-ink-muted">Your training companion</p>
             </div>
             <button
               type="button"
@@ -246,6 +246,7 @@ function AccountChat() {
                 </div>
               </div>
             ))}
+            {messages.length === 1 && !isLoading && <div className="flex flex-wrap gap-2 pt-1" aria-label="Suggested prompts">{['Help me plan a workout', 'How can I get started?', 'Explain membership options'].map(prompt => <button key={prompt} type="button" className="btn-ghost text-xs" onClick={() => setInputValue(prompt)}>{prompt}</button>)}</div>}
             {isLoading && (
               <div className="flex justify-start">
                 <div className="glass-inset flex items-center space-x-2 px-4 py-3 text-ink-muted">
