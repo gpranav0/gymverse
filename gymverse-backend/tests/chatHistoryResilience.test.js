@@ -8,6 +8,24 @@ const { createHistoryStore } = require('../src/services/chatHistoryService');
 
 const SECRET_URI = 'mongodb://chat_user:not-a-real-password@cluster.example.net/?tls=true';
 
+test.each([
+  [Object.assign(new Error(SECRET_URI), { code: 18 }), 'authentication'],
+  [Object.assign(new Error(SECRET_URI), { code: 13 }), 'permissions'],
+  [Object.assign(new Error(SECRET_URI), { code: 'ENOTFOUND' }), 'dns'],
+  [Object.assign(new Error(SECRET_URI), { reason: { servers: new Map([['private-host', {
+    error: new Error('TLS failure ' + SECRET_URI),
+  }]]) } }), 'tls'],
+])('connection diagnostics expose only a safe category', async (failure, category) => {
+  const log = jest.fn();
+  const store = createHistoryStore({ uri: SECRET_URI, log,
+    clientFactory: () => fakeClient({ command: async () => { throw failure; } }) });
+  await store.probe();
+  const logged = log.mock.calls.flat().join('\n');
+  expect(logged).toContain(`connect; ${category}`);
+  expect(logged).not.toMatch(/not-a-real-password|chat_user|cluster\.example|private-host/);
+  await store.close();
+});
+
 const fakeClient = ({ command = async () => ({ ok: 1 }), updateOne = async () => ({}) } = {}) => {
   const client = new EventEmitter();
   client.db = () => ({ command, collection: () => ({ createIndex: async () => 'ok',

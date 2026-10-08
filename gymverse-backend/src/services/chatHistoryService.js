@@ -15,6 +15,29 @@ const GAP_NOTICE = 'Some earlier messages were temporary and are not in saved hi
 const hasWritableServer = (description) =>
   [...(description?.servers?.values?.() || [])].some((server) => server.isWritable);
 
+// Report only fixed categories: driver errors can contain credentials and hosts.
+function connectionFailureCategory(error) {
+  const pending = [error];
+  const seen = new Set();
+  let fallback = 'connection';
+  while (pending.length) {
+    const current = pending.shift();
+    if (!current || seen.has(current)) continue;
+    seen.add(current);
+    if (current.code === 18) return 'authentication';
+    if (current.code === 13) return 'permissions';
+    if ([85, 86, 11000].includes(current.code)) return 'indexes';
+    if (current.name === 'MongoParseError') return 'configuration';
+    if (/^(ERR_TLS_|CERT_|DEPTH_ZERO_SELF_SIGNED_CERT|UNABLE_TO_VERIFY_LEAF_SIGNATURE)/.test(String(current.code || '')) ||
+      /TLS(?:V\d| handshake| failure| error)|SSL routines|SSL_ERROR/i.test(String(current.message || ''))) return 'tls';
+    if (['ENOTFOUND', 'EAI_AGAIN', 'ENODATA'].includes(current.code)) fallback = 'dns';
+    else if (['ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT'].includes(current.code) && fallback !== 'dns') fallback = 'network';
+    pending.push(current.cause);
+    for (const server of current.reason?.servers?.values?.() || []) pending.push(server.error);
+  }
+  return fallback;
+}
+
 // A disconnected store never buffers writes. The next successful probe only enables
 // future requests; it never replays an exchange from the outage.
 function createHistoryStore({
@@ -45,6 +68,7 @@ function createHistoryStore({
   async function probe() {
     if (!uri || probing || closed) return;
     probing = true;
+    let stage = 'connect';
     try {
       if (!client) {
         client = clientFactory(uri, {
@@ -72,6 +96,7 @@ function createHistoryStore({
         });
       }
       await client.db(database).command({ ping: 1 }, { timeoutMS: PROBE_TIMEOUT_MS });
+      stage = 'history-indexes';
       if (!collection) {
         const target = client.db(database).collection('chat_exchanges');
         const opts = { timeoutMS: PROBE_TIMEOUT_MS };
@@ -82,6 +107,7 @@ function createHistoryStore({
         collection = target;
       }
       if (!profiles) {
+        stage = 'profile-indexes';
         const target = client.db(database).collection('member_profiles');
         const opts = { timeoutMS: PROBE_TIMEOUT_MS };
         // Pre-namespace mirrors cannot be attributed to production. Preserve them as legacy.
@@ -96,10 +122,11 @@ function createHistoryStore({
         reportedUnreachable = false;
         log('Chat history: MongoDB connected — new messages will be saved.');
       }
-    } catch {
+    } catch (error) {
       // Never log the driver's error: it can carry the URI, hostnames or the username.
       if (!available && !reportedUnreachable) {
         reportedUnreachable = true;
+        log(`Chat history: MongoDB check failed (${stage}; ${connectionFailureCategory(error)}).`);
         log('Chat history: cannot reach MongoDB — chat continues in temporary mode and will keep retrying. ' +
           'If the hosts resolve but TLS fails, add this server\'s IP under Atlas > Network Access.');
       }
