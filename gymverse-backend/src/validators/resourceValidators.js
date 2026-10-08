@@ -1,4 +1,5 @@
 const { body, query } = require('express-validator');
+const { healthConditionsRule } = require('./healthInformation');
 
 // Mirrors of the CHECK constraints in database/01_schema.sql. Keeping them here means a
 // bad value is a 400 with a useful message rather than a constraint violation bubbling
@@ -43,6 +44,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 /* ---------------------------------------------------------------- members */
 
 const memberCreateValidator = [
+  healthConditionsRule(),
   body('member_code').trim().isLength({ min: 1, max: 50 }).withMessage('member_code is required (max 50 chars)'),
   nameRule('member_name', 'member_name'),
   phoneRule('phone', 'phone'),
@@ -58,6 +60,7 @@ const memberCreateValidator = [
 
 // PUT replaces the record, so the core fields are mandatory. PATCH is the partial verb.
 const memberUpdateValidator = [
+  healthConditionsRule(),
   nameRule('member_name', 'member_name'),
   phoneRule('phone', 'phone'),
   opt('address').trim().isLength({ max: 500 }),
@@ -67,6 +70,7 @@ const memberUpdateValidator = [
 ];
 
 const memberPatchValidator = [
+  healthConditionsRule(),
   opt('member_name').trim().isLength({ min: 2, max: 100 }).withMessage('member_name must be 2-100 characters'),
   optPhoneRule('phone', 'phone'),
   opt('address').trim().isLength({ max: 500 }),

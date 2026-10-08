@@ -1,4 +1,5 @@
 const { check } = require('express-validator');
+const { healthConditionsRule } = require('./healthInformation');
 
 // Long-but-simple passphrases beat short-but-gnarly passwords, so the floor is length
 // with a light mixed-character requirement rather than a wall of symbol rules. Shared by
@@ -20,6 +21,7 @@ const emailRule = () =>
 // The old `.escape()` here HTML-encoded them on the way *into* the database, so
 // "O'Brien" was persisted as "O&#x27;Brien" and stayed wrong everywhere downstream.
 const registerValidator = [
+  healthConditionsRule(),
   check('username')
     .trim()
     .isLength({ min: 3, max: 100 }).withMessage('Username must be 3-100 characters')

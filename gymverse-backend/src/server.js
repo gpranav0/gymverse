@@ -17,7 +17,9 @@ const db = require('./config/database');
 const { startMaintenance } = require('./jobs/maintenance');
 
 const chatHistory = require('./services/chatHistoryService');
+const { startProfileSync } = require('./services/memberMirrorService');
 chatHistory.start(); // Optional: never await MongoDB to start the API.
+const stopProfileSync = startProfileSync();
 
 const PORT = process.env.PORT || 5000;
 
@@ -36,6 +38,7 @@ const startServer = async () => {
     const shutdown = async (signal) => {
       console.log(`\n${signal} received, shutting down gracefully...`);
       stopMaintenance();
+      stopProfileSync();
       server.close(async () => {
         await Promise.allSettled([db.pool.end(), chatHistory.close()]);
         process.exit(0);

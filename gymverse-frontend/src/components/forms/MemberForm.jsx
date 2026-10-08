@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Select from '../ui/Select';
+import HealthConditionsField from './HealthConditionsField';
 
 export default function MemberForm({ initialData, onSubmit, onCancel, loading }) {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ export default function MemberForm({ initialData, onSubmit, onCancel, loading })
     gender: 'Other',
     date_of_birth: '',
     address: '',
+    health_conditions: '',
     emergency_contact_name: '',
     emergency_contact_phone: '',
     status: 'active'
@@ -83,6 +85,8 @@ export default function MemberForm({ initialData, onSubmit, onCancel, loading })
         <span className="label-caps">Address</span>
         <textarea name="address" value={formData.address || ''} onChange={handleChange} rows="2" className="field text-sm" />
       </label>
+
+      <HealthConditionsField value={formData.health_conditions} onChange={handleChange} disabled={loading} />
 
       <div className="grid grid-cols-2 gap-4">
         <label className="flex flex-col gap-1.5">

@@ -20,10 +20,11 @@ const hasWritableServer = (description) =>
 function createHistoryStore({
   uri,
   database = 'gymverse_chat',
+  profileNamespace = 'default',
   clientFactory = (u, o) => new MongoClient(u, o),
   log = () => {},
 } = {}) {
-  let client, collection, timer, probing = false, closed = false;
+  let client, collection, profiles, timer, probing = false, closed = false;
   let available = false, epoch = randomUUID();
   // The first failed probe used to log nothing at all, so the log said "connecting..."
   // forever. Say once that it failed and what usually causes it, still without driver text.
@@ -80,6 +81,16 @@ function createHistoryStore({
         await target.createIndex({ userId: 1, createdAt: -1 }, { name: 'owned_recent', ...opts });
         collection = target;
       }
+      if (!profiles) {
+        const target = client.db(database).collection('member_profiles');
+        const opts = { timeoutMS: PROBE_TIMEOUT_MS };
+        // Pre-namespace mirrors cannot be attributed to production. Preserve them as legacy.
+        await target.updateMany({ namespace: { $exists: false } }, { $set: { namespace: 'legacy' } }, opts);
+        await target.createIndex({ namespace: 1, memberId: 1 }, { unique: true, name: 'scoped_member_profile', ...opts });
+        try { await target.dropIndex('owned_member_profile', opts); }
+        catch (error) { if (error.code !== 27) throw error; }
+        profiles = target;
+      }
       if (!closed && !available) {
         available = true;
         reportedUnreachable = false;
@@ -99,6 +110,7 @@ function createHistoryStore({
       const failed = client;
       client = undefined;
       collection = undefined;
+      profiles = undefined;
       Promise.resolve().then(() => failed?.close()).catch(() => {});
     } finally {
       probing = false;
@@ -122,13 +134,19 @@ function createHistoryStore({
   // epoch, is never saved — that is what stops an outage's messages being backfilled.
   const ticket = () => (available ? epoch : null);
 
-  async function save({ userId, conversationId, requestId, message, response, gapBefore, startedAt, eligible }) {
+  async function save({ userId, conversationId, requestId, message, response, gapBefore, startedAt, eligible, grounding }) {
     if (!eligible || !available || eligible !== epoch) return { saved: false, ...status() };
     const createdAt = new Date();
     try {
       await collection.updateOne({ userId, conversationId, requestId }, {
         $setOnInsert: {
           userId, conversationId, requestId, createdAt, epoch,
+          schemaVersion: 2,
+          grounding: {
+            source: 'postgresql',
+            accountContextAvailable: grounding?.accountContextAvailable === true,
+            healthContextProvided: grounding?.healthContextProvided === true,
+          },
           gapBefore: !!gapBefore,
           messages: [
             { id: `${requestId}:user`, role: 'user', content: message, timestamp: startedAt },
@@ -143,6 +161,29 @@ function createHistoryStore({
       offline();
       return { saved: false, ...status() };
     }
+  }
+
+  async function syncMember(member) {
+    if (!available || !profiles) return { synced: false, ...status() };
+    try {
+      // Mirror only coaching fields, never credentials, contact information or general notes.
+      await profiles.updateOne({ namespace: profileNamespace, memberId: member.member_id }, { $set: {
+        namespace: profileNamespace,
+        schemaVersion: 1, source: 'postgresql', memberId: member.member_id,
+        name: member.member_name, dateOfBirth: member.date_of_birth || null,
+        status: member.status, joinedOn: member.join_date,
+        healthConditions: member.health_conditions || null, syncedAt: new Date(),
+      } }, { upsert: true });
+      return { synced: true, ...status() };
+    } catch { offline(); return { synced: false, ...status() }; }
+  }
+
+  async function deleteMemberProfile(memberId) {
+    if (!available || !profiles) return { synced: false, ...status() };
+    try {
+      await profiles.deleteOne({ namespace: profileNamespace, memberId });
+      return { synced: true, ...status() };
+    } catch { offline(); return { synced: false, ...status() }; }
   }
 
   async function list(userId) {
@@ -182,12 +223,14 @@ function createHistoryStore({
 
   async function close() { closed = true; clearInterval(timer); available = false; await client?.close(); }
 
-  return { start, probe, status, ticket, save, list, read, close };
+  return { start, probe, status, ticket, save, list, read, close, syncMember, deleteMemberProfile };
 }
 
 const store = createHistoryStore({
   uri: process.env.MONGODB_URI,
   database: process.env.MONGODB_DB_NAME || 'gymverse_chat',
+  profileNamespace: process.env.MONGODB_PROFILE_NAMESPACE ||
+    `${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || '5432'}/${process.env.DB_NAME || 'gymverse'}`,
   log: (line) => console.log(line),
 });
 

@@ -3,6 +3,8 @@ const { paginate } = require('../utils/pagination');
 const { buildUpdate, buildReplace } = require('../utils/updateBuilder');
 const { isStaff, parseId, trainerOwnsMember } = require('../utils/authorize');
 const { forbidden, notFoundError } = require('../utils/AppError');
+const { syncMemberById } = require('../services/memberMirrorService');
+const atlas = require('../services/chatHistoryService');
 
 // Columns safe to return in a list. `SELECT *` used to hand every caller the member's
 // address, date of birth and emergency contacts.
@@ -11,14 +13,14 @@ const LIST_COLUMNS = 'member_id, member_code, member_name, email, phone, status,
 // The full record, for the member themselves and for staff.
 const DETAIL_COLUMNS = `member_id, member_code, member_name, gender, date_of_birth, phone, email,
   address, emergency_contact_name, emergency_contact_phone, join_date, status, profile_photo_url,
-  created_at, updated_at`;
+  health_conditions, created_at, updated_at`;
 
 // What a trainer may see about a client: enough to coach them, minus the personal file.
 const TRAINER_VISIBLE_COLUMNS = `member_id, member_code, member_name, gender, date_of_birth,
   phone, email, join_date, status, profile_photo_url`;
 
 // Fields a caller may write. `status` is filtered separately by role.
-const WRITABLE_FIELDS = ['member_name', 'phone', 'address', 'emergency_contact_name', 'emergency_contact_phone', 'status'];
+const WRITABLE_FIELDS = ['member_name', 'phone', 'address', 'emergency_contact_name', 'emergency_contact_phone', 'status', 'health_conditions'];
 const REQUIRED_ON_PUT = ['member_name', 'phone'];
 
 // Only the front desk may change a member's standing.
@@ -102,18 +104,19 @@ const getMemberById = async (req, res, next) => {
 // @access  Private (Admin, Receptionist)
 const createMember = async (req, res, next) => {
   try {
-    const { member_code, member_name, gender, date_of_birth, phone, email, address, emergency_contact_name, emergency_contact_phone, status } = req.body;
+    const { member_code, member_name, gender, date_of_birth, phone, email, address, emergency_contact_name, emergency_contact_phone, status, health_conditions } = req.body;
 
     const result = await db.query(
       `INSERT INTO members
-        (member_code, member_name, gender, date_of_birth, phone, email, address, emergency_contact_name, emergency_contact_phone, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        (member_code, member_name, gender, date_of_birth, phone, email, address, emergency_contact_name, emergency_contact_phone, status, health_conditions)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING ${DETAIL_COLUMNS}`,
       [member_code, member_name, gender || null, date_of_birth || null, phone, email, address || null,
-        emergency_contact_name || null, emergency_contact_phone || null, status || 'active']
+        emergency_contact_name || null, emergency_contact_phone || null, status || 'active', health_conditions || null]
     );
 
     res.status(201).json({ success: true, message: 'Member created successfully', data: result.rows[0] });
+    void syncMemberById(result.rows[0].member_id);
   } catch (error) {
     next(error);
   }
@@ -146,6 +149,7 @@ const saveMember = ({ replace, message }) => async (req, res, next) => {
     }
 
     res.status(200).json({ success: true, message, data: result.rows[0] });
+    void syncMemberById(id);
   } catch (error) {
     next(error);
   }
@@ -168,6 +172,7 @@ const deleteMember = async (req, res, next) => {
     }
 
     res.status(200).json({ success: true, message: 'Member deleted successfully' });
+    void atlas.deleteMemberProfile(id).catch(() => {});
   } catch (error) {
     next(error);
   }

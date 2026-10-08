@@ -23,10 +23,28 @@ The Node.js/Express REST API powering GymVerse, a gym management system.
   last seat cannot both win.
 - **Dashboard & reporting** — aggregation is done in SQL rather than by pulling rows into
   JavaScript.
-- **AI assistant** — Gemini with a Groq fallback, grounded on the live plan catalogue so
-  it cannot quote prices that do not exist.
-- **Chat history (optional)** — MongoDB Atlas stores chat conversations only; PostgreSQL
-  stays the database for everything else. Users can also start a temporary chat that is
+- **AI assistant** — Gemini with a Groq fallback, grounded on the live plan catalogue
+  and the signed-in member's current database records. Account retrieval uses the
+  authenticated user ID, not IDs supplied in the question or request body. Context
+  includes age (calculated from date of birth), membership dates/status, active goals,
+  latest progress, current workout/diet assignments, optional self-reported health
+  conditions/exercise limitations, and a 30-day attendance summary.
+  Both providers receive the same context. Credentials, contact details, private notes,
+  and other members' records are excluded. Relevant personal facts are sent to the AI
+  provider and may appear in saved replies; temporary chats bypass saving and caching.
+  Context is fetched before reply-cache lookup so changed records invalidate old replies.
+  Missing profiles or failed retrieval are explicitly reported to the model, which is
+  instructed to ask for missing details rather than invent them. Chat is read-only.
+- **Optional health information** — members can record up to 1000 characters at signup
+  or update/clear it in Account settings. Staff can maintain it in the member form.
+  Blank text becomes NULL; this means unknown, not confirmation of no health problems.
+  The field is excluded from member lists, trainer projections and audit snapshots.
+  Coach treats it as self-reported data, considers exercise restrictions, and is instructed
+  to avoid diagnosis or claims of medical clearance. Migration 19 adds the nullable field
+  without changing existing member records.
+- **Atlas integration (optional)** — MongoDB Atlas stores chat conversations and coaching
+  profile mirrors, including optional health information. PostgreSQL remains the source
+  for authentication and live account retrieval. Users can also start a temporary chat that is
   never saved. Setup and guarantees: [CHAT_HISTORY.md](CHAT_HISTORY.md).
 
 ## Running Locally

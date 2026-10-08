@@ -1,0 +1,75 @@
+# Run from this folder: docker compose --env-file .env.docker up --build -d
+name: gymverse
+
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: gymverse
+      POSTGRES_USER: gymverse
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env.docker}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "PGPASSWORD=\"$$POSTGRES_PASSWORD\" psql -h 127.0.0.1 -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\" -c 'SELECT 1' >/dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  backend:
+    image: gymverse-backend:local
+    build:
+      context: .
+      dockerfile: gymverse-backend/Dockerfile
+    init: true
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: gymverse
+      DB_USER: gymverse
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env.docker}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env.docker}
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:${FRONTEND_PORT:-5000}}
+      CORS_ORIGIN: ${CORS_ORIGIN:-${APP_BASE_URL:-http://localhost:${FRONTEND_PORT:-5000}},http://127.0.0.1:${FRONTEND_PORT:-5000}}
+      TRUST_PROXY: "true"
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      MONGODB_URI: ${MONGODB_URI:-}
+      MONGODB_DB_NAME: ${MONGODB_DB_NAME:-gymverse_chat}
+      MONGODB_PROFILE_NAMESPACE: ${MONGODB_PROFILE_NAMESPACE:-local-docker}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-GymVerse <no-reply@gymverse.local>}
+    # Frontend talks to backend:5000; only the frontend is published to Windows.
+    expose:
+      - "5000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    image: gymverse-frontend:local
+    build:
+      context: .
+      dockerfile: gymverse-frontend/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-5000}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  # Keep the existing name so recreating containers reuses the same database.
+  postgres_data:
+    name: gymverse_postgres_data

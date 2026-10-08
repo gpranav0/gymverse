@@ -6,6 +6,7 @@ const { AppError } = require('../utils/AppError');
 const { issueToken, consumeToken } = require('../utils/authTokens');
 const { passwordResetEmail, verificationEmail, appUrl } = require('../services/emailService');
 const { withTransaction } = require('../utils/transaction');
+const { syncMemberById } = require('../services/memberMirrorService');
 
 // A real bcrypt hash of a value nobody can supply. Comparing against it when the email
 // is unknown keeps the failing path the same cost as the succeeding one.
@@ -55,7 +56,7 @@ const sendVerification = async (clientOrPool, user) => {
 // @access  Public
 const registerUser = async (req, res, next) => {
   try {
-    const { username, email, password, role_name, name, phone, specialization, qualification } = req.body;
+    const { username, email, password, role_name, name, phone, specialization, qualification, health_conditions } = req.body;
 
     const targetRole = role_name;
     if (targetRole !== 'member' && targetRole !== 'trainer') {
@@ -78,8 +79,8 @@ const registerUser = async (req, res, next) => {
 
       if (targetRole === 'member') {
         const memberResult = await client.query(
-          'INSERT INTO members (member_code, member_name, phone, email, status) VALUES ($1, $2, $3, $4, $5) RETURNING member_id',
-          [recordCode('MEM'), name, phone, email, 'active']
+          'INSERT INTO members (member_code, member_name, phone, email, status, health_conditions) VALUES ($1, $2, $3, $4, $5, $6) RETURNING member_id',
+          [recordCode('MEM'), name, phone, email, 'active', health_conditions || null]
         );
         newMemberId = memberResult.rows[0].member_id;
       } else {
@@ -99,6 +100,8 @@ const registerUser = async (req, res, next) => {
       // account can never exist without a way to verify it.
       return { user: created, memberId: newMemberId, verification: await sendVerification(client, { ...created, name }) };
     });
+
+    if (memberId) void syncMemberById(memberId);
 
     // The account is committed, so a mail problem must not turn this signup into an error
     // response; the user can ask for a fresh link. Not awaited, like the other auth mails.

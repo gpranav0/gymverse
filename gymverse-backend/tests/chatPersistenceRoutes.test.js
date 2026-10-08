@@ -41,6 +41,27 @@ test('anonymous history access is rejected', async () => {
   expect((await request(app).get('/api/chat/conversations')).status).toBe(401);
 });
 
+test('chat ignores supplied account IDs and refreshes context before using cached replies', async () => {
+  let age = 24;
+  db.query.mockImplementation(async sql => String(sql).includes('AS account_context')
+    ? { rows: [{ account_context: { profile: { age } } }] }
+    : { rows: [{ user_id: 88, role: 'member' }] });
+  const ask = () => request(app).post('/api/chat')
+    .set('Authorization', `Bearer ${generateToken(88, 'member')}`)
+    .send({ message: 'How old am I?', userId: 999, member_id: 999, accountContext: { profile: { age: 99 } } });
+  await ask();
+  const cached = await ask();
+  expect(cached.body.source).toBe('cache');
+  age = 25;
+  const refreshed = await ask();
+  expect(refreshed.body.source).toBe('ai');
+  expect(ai.generateChatResponse).toHaveBeenLastCalledWith('How old am I?', [],
+    { status: 'available', data: { profile: { age: 25 } } });
+  const contextCalls = db.query.mock.calls.filter(([sql]) => String(sql).includes('AS account_context'));
+  expect(contextCalls).toHaveLength(3);
+  contextCalls.forEach(([, params]) => expect(params).toEqual([88]));
+});
+
 describe('temporary chat', () => {
   const member = () => ({ Authorization: `Bearer ${generateToken(88, 'member')}` });
   beforeEach(() => {

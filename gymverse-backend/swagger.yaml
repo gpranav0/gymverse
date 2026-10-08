@@ -95,6 +95,7 @@ components:
           description: Public registration is limited to these two roles. Trainers are created with status `pending` and cannot log in until an admin approves them.
         specialization: { type: string, description: Trainers only. }
         qualification: { type: string, description: Trainers only. }
+        health_conditions: { type: string, nullable: true, maxLength: 1000, description: 'Optional member-reported health conditions or exercise limitations. Members only; blank clears the value.' }
 
     AuthSuccess:
       type: object
@@ -125,6 +126,7 @@ components:
         address: { type: string }
         emergency_contact_name: { type: string }
         emergency_contact_phone: { type: string }
+        health_conditions: { type: string, nullable: true, maxLength: 1000, description: 'Optional self-reported health information. Available to the member and staff in detail responses; excluded from lists and trainer responses.' }
         join_date: { type: string, format: date }
         status: { type: string, enum: [active, inactive, suspended, expired] }
 
@@ -1057,6 +1059,14 @@ paths:
         15 minutes, because every call spends money on the gym's own AI keys. Gemini is
         tried first with Groq as a fallback. Standalone questions are cached for 10
         minutes; follow-ups that carry `conversationHistory` are never served from cache.
+        The backend retrieves the signed-in member's profile (including calculated age),
+        memberships, goals, latest progress, workout/diet assignments and attendance
+        summary from PostgreSQL on each request. Account ownership comes exclusively
+        from authentication; client-provided account IDs are ignored. Changed account
+        context invalidates cached replies. Relevant personal context is sent to the AI
+        provider; missing data is marked unavailable rather than guessed. Chat is read-only.
+        Optional health conditions are included as self-reported information to tailor
+        fitness suggestions; an empty field is treated as unknown, not medical clearance.
 
         When MongoDB chat history is connected, each exchange is saved under the
         authenticated user. Send `temporary: true` for a conversation that must not be

@@ -114,6 +114,13 @@ export default function MemberProfile() {
         </GlassPanel>
 
         <div className="flex min-w-0 flex-col gap-4">
+          {Object.hasOwn(member, 'health_conditions') && (
+            <GlassPanel className="px-[22px] py-5">
+              <h3 className="m-0 mb-3 font-display text-[16.5px] font-semibold">Health information</h3>
+              <p className="m-0 whitespace-pre-wrap break-words text-sm text-ink-soft">{member.health_conditions || 'Not provided.'}</p>
+              <p className="mt-2 mb-0 text-xs text-ink-muted">Self-reported conditions and exercise limitations.</p>
+            </GlassPanel>
+          )}
           <GlassPanel delay={80} className="px-[22px] py-5">
             <div className="mb-4 flex items-center gap-2 border-b border-white/10 pb-3">
               <Activity size={18} style={{ color: 'var(--gv-accent)' }} />

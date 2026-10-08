@@ -143,9 +143,20 @@ async function seed(pool) {
   if (process.env.NODE_ENV === 'production') {
     throw new Error('Refusing to load development seed data with NODE_ENV=production.');
   }
-  await pool.query(read('07_seed.sql'));
-  // Seeded accounts are fixtures, not signups: they count as verified.
-  await pool.query('UPDATE users SET email_verified_at = COALESCE(email_verified_at, created_at, CURRENT_TIMESTAMP)');
+  const client = await pool.connect();
+  try {
+    // A duplicate or invalid fixture must not leave a partly populated database.
+    await client.query('BEGIN');
+    await client.query(read('07_seed.sql'));
+    // Seeded accounts are fixtures, not signups: they count as verified.
+    await client.query('UPDATE users SET email_verified_at = COALESCE(email_verified_at, created_at, CURRENT_TIMESTAMP)');
+    await client.query('COMMIT');
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 module.exports = { createMigrationPool, migrate, status, seed };

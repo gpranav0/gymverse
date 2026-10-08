@@ -8,7 +8,11 @@ const path = require('path');
 const { Pool } = require('pg');
 require('dotenv').config({ path: path.join(__dirname, '.env'), quiet: true });
 
-const TEST_DB = 'gymverse_stack_check';
+// The isolated test server must omit development stack traces and permit fixtures,
+// regardless of the caller's container NODE_ENV.
+process.env.NODE_ENV = 'test';
+
+const TEST_DB = `gymverse_stack_check_${require('crypto').randomBytes(6).toString('hex')}`;
 const PORT = 5099;
 const BASE = `http://localhost:${PORT}/api`;
 
@@ -45,7 +49,6 @@ const call = async (method, route, body, token) => {
 (async () => {
   // --- build a scratch database -------------------------------------------------
   const admin = new Pool({ ...adminCfg, database: 'postgres' });
-  await admin.query(`DROP DATABASE IF EXISTS ${TEST_DB}`);
   await admin.query(`CREATE DATABASE ${TEST_DB}`);
   await admin.end();
 
@@ -54,6 +57,10 @@ const call = async (method, route, body, token) => {
   try {
     const { applied } = await migrate(seedPool, { log: () => {} });
     for (const file of applied) check(true, file);
+    const requiredRoles = await seedPool.query('SELECT role_name FROM roles ORDER BY role_name');
+    check(JSON.stringify(requiredRoles.rows.map((r) => r.role_name)) ===
+      JSON.stringify(['admin', 'member', 'receptionist', 'trainer']),
+    'fresh migrations include required roles without demo data');
     const again = await migrate(seedPool, { log: () => {} });
     check(again.applied.length === 0, 'second migrate run is a no-op');
     await seed(seedPool);
@@ -96,6 +103,50 @@ const call = async (method, route, body, token) => {
   });
   check(reg.status === 201, 'member self-registration', JSON.stringify(reg.data).slice(0, 120));
   const memberToken = reg.data?.data?.token;
+
+  console.log('\nAccount chat context:');
+  const { getAccountContext } = require('./src/services/accountContextService');
+  const registeredUserId = reg.data?.data?.user_id;
+  const initialContext = await getAccountContext(registeredUserId);
+  check(initialContext.status === 'available' && initialContext.data?.profile.name === 'Stack Check',
+    'account context resolves the registered member from the user ID');
+  check(initialContext.data?.profile.age === null,
+    'missing birth date stays unknown instead of inventing an age');
+  check(initialContext.data?.memberships.length === 0 && initialContext.data?.goals.length === 0
+    && initialContext.data?.latest_progress === null,
+    'new member context does not include seeded members records');
+  await db.query(`UPDATE members SET date_of_birth = (CURRENT_DATE - INTERVAL '25 years')::date
+    WHERE member_id = (SELECT member_id FROM users WHERE user_id = $1)`, [registeredUserId]);
+  const updatedContext = await getAccountContext(registeredUserId);
+  check(updatedContext.data?.profile.age === 25, 'context calculates age and immediately reflects profile updates');
+  check((await getAccountContext(login.data?.data?.user_id)).status === 'no_member_profile',
+    'staff account without member profile does not borrow a member context');
+
+  const ownMemberId = reg.data?.data?.member_id;
+  check(initialContext.data?.profile.health_conditions === null, 'optional health information starts unknown');
+  const healthSaved = await call('PATCH', `/members/${ownMemberId}`, { health_conditions: '  Knee injury; avoid jumping  ' }, memberToken);
+  check(healthSaved.status === 200 && healthSaved.data?.data?.health_conditions === 'Knee injury; avoid jumping',
+    'member can save trimmed health information');
+  check((await getAccountContext(registeredUserId)).data?.profile.health_conditions === 'Knee injury; avoid jumping',
+    'chat retrieves fresh health limitations for the signed-in member');
+  const healthAudits = await db.query(`SELECT 1 FROM audit_logs WHERE table_name = 'members'
+    AND (old_data ? 'health_conditions' OR new_data ? 'health_conditions') LIMIT 1`);
+  check(healthAudits.rows.length === 0, 'health information is excluded from audit snapshots');
+  const tooLong = await call('PATCH', `/members/${ownMemberId}`, { health_conditions: 'a'.repeat(1001) }, memberToken);
+  check(tooLong.status === 422, 'oversized health text is rejected');
+  const otherHealth = await call('PATCH', '/members/1', { health_conditions: 'Asthma' }, memberToken);
+  check(otherHealth.status === 403, 'member cannot modify another member health information');
+  const clearedHealth = await call('PATCH', `/members/${ownMemberId}`, { health_conditions: '' }, memberToken);
+  check(clearedHealth.status === 200 && (await getAccountContext(registeredUserId)).data?.profile.health_conditions === null,
+    'clearing health information removes it from fresh chat context');
+  const healthReg = await call('POST', '/auth/register', {
+    username: `health${stamp}`, name: 'Health Check', phone: `8${String(stamp).slice(-9)}`,
+    email: `health${stamp}@example.com`, password: 'secret123', role_name: 'member', health_conditions: 'Asthma'
+  });
+  check(healthReg.status === 201 && (await getAccountContext(healthReg.data?.data?.user_id)).data?.profile.health_conditions === 'Asthma',
+    'optional health information submitted during signup is saved and retrieved');
+  check((await getAccountContext(registeredUserId)).data?.profile.health_conditions === null,
+    'another account health information never enters the original member context');
 
   console.log('\nRead endpoints (admin):');
   const routes = ['/auth/me', '/dashboard/overview', '/dashboard/revenue', '/members?page=1&limit=5',

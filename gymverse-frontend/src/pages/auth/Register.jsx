@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { getErrorMessage } from '../../services/api';
 import AuthShell from '../../components/ui/AuthShell';
 import Select from '../../components/ui/Select';
+import HealthConditionsField from '../../components/forms/HealthConditionsField';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ export default function Register() {
     role_name: 'member',
     specialization: '',
     qualification: '',
+    health_conditions: '',
     honeypot: ''
   });
   const [error, setError] = useState(null);
@@ -61,6 +63,7 @@ export default function Register() {
     try {
       // Client-only fields have no business on the wire.
       const { honeypot: _hp, confirmPassword: _cp, ...payload } = formData;
+      if (payload.role_name !== 'member') delete payload.health_conditions;
       const result = await register(payload);
 
       if (formData.role_name === 'trainer') {
@@ -137,6 +140,8 @@ export default function Register() {
                 <option value="trainer">Trainer</option>
               </Select>
             </label>
+
+            {formData.role_name === 'member' && <HealthConditionsField value={formData.health_conditions} onChange={handleChange} disabled={loading} />}
 
             {formData.role_name === 'trainer' && (
               <div className="glass-inset grid grid-cols-2 gap-3.5 p-4">

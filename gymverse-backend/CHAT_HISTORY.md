@@ -2,12 +2,33 @@
 
 PostgreSQL remains the only database for gym records and authentication — users, roles,
 memberships, payments, attendance, workouts and classes. MongoDB stores **only** chat
-exchanges, in the `chat_exchanges` collection. Each document holds one request: the user
+exchanges in `chat_exchanges` and coaching profile mirrors in `member_profiles`. Each chat document holds one request: the user
 message and the AI reply, inserted together.
 
 Stored fields: `userId` (the PostgreSQL `user_id`), `conversationId`, `requestId`,
 `createdAt`, `epoch`, `gapBefore`, and `messages[]` with `id`, `role`, `content`,
 `timestamp`. No tokens, passwords or API keys are written.
+
+New chat exchanges have `schemaVersion: 2` and `grounding` flags indicating whether
+account context and health context were provided. The flags describe inputs, not proof
+that the model used them. Raw account context is not duplicated into chat documents;
+health details may still appear in user messages or AI replies. Existing exchanges stay
+unchanged and remain readable; their past grounding cannot be inferred reliably.
+
+`member_profiles` mirrors member ID, name, date of birth, status, join date and optional
+health conditions. Each profile is scoped by `MONGODB_PROFILE_NAMESPACE` and member ID.
+Use `production` on Render and `local-docker` for Docker so their sync jobs cannot
+overwrite each other. If unset, the backend derives a namespace from PostgreSQL host,
+port and database name. Existing unscoped snapshots are preserved under `legacy`.
+
+The profile mirror synchronizes
+health conditions from PostgreSQL. Signup and profile edits attempt a background sync;
+Atlas outages do not block account edits. A background reconciliation refreshes current
+profiles every minute when Atlas is available. Run `node sync_atlas.js` to refresh all current
+profiles after an outage. Chat continues to retrieve fresh facts from PostgreSQL, never
+from a possibly stale mirror. Clearing health information writes null to the mirror.
+The same database user's `readWrite` permission covers both collections; credentials
+and contact details are excluded from mirrors.
 
 ## Atlas setup
 

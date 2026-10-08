@@ -7,6 +7,7 @@ import { getErrorMessage } from '../../services/api';
 import { passwordProblem } from '../../utils/passwordPolicy';
 import { GlassPanel, Pill } from '../../components/ui/Glass';
 import { PageHeader, ErrorNote, SuccessNote } from '../../components/ui/States';
+import HealthInformation from '../../components/HealthInformation';
 
 const EMPTY = { current_password: '', new_password: '', confirm_password: '' };
 
@@ -76,9 +77,10 @@ export default function AccountSettings() {
 
   return (
     <div className="flex flex-col gap-4">
-      <PageHeader title="Account" subtitle="Your sign-in details and security settings" />
+      <PageHeader title="Account" subtitle="Your profile, health information and security settings" />
 
       <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(320px,1fr))]">
+        {user.member_id && <HealthInformation key={`${user.user_id}:${user.member_id}`} memberId={user.member_id} />}
         <GlassPanel className="px-[22px] py-5">
           <PanelTitle icon={ShieldCheck}>Profile</PanelTitle>
           <dl className="m-0 flex flex-col gap-2.5">

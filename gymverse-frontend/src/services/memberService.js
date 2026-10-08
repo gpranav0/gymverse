@@ -8,4 +8,6 @@ export const createMember = async (data) => (await api.post('/members', data)).d
 
 export const updateMember = async (id, data) => (await api.put(`/members/${id}`, data)).data;
 
+export const patchMember = async (id, data) => (await api.patch(`/members/${id}`, data)).data;
+
 export const deleteMember = async (id) => (await api.delete(`/members/${id}`)).data;

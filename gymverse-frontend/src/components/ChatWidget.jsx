@@ -204,6 +204,7 @@ function AccountChat() {
           </div>
 
           <div className="shrink-0 space-y-2 border-b border-white/10 px-4 py-3">
+            <p className="text-xs text-ink-muted">Coach uses your profile and fitness records to personalize replies. Relevant details are shared with our AI provider.</p>
             {temporary ? (
               <p role="status" className="flex items-center gap-1.5 text-xs text-violet">
                 <MessageSquareDashed size={13} aria-hidden="true" className="shrink-0" />
