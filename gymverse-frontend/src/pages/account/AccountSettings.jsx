@@ -14,7 +14,7 @@ const EMPTY = { current_password: '', new_password: '', confirm_password: '' };
 function PanelTitle({ icon: Icon, children }) {
   return (
     <div className="mb-4 flex items-center gap-2 border-b border-white/10 pb-3">
-      <Icon size={18} style={{ color: 'var(--gv-accent)' }} />
+      <Icon size={18} style={{ color: 'var(--color-primary)' }} />
       <h2 className="m-0 font-display text-[16.5px] font-semibold tracking-[-.2px]">{children}</h2>
     </div>
   );
@@ -142,7 +142,7 @@ export default function AccountSettings() {
           </p>
           {confirmEverywhere ? (
             <div className="flex flex-wrap items-center gap-2.5">
-              <span className="text-[13px] text-[#ffdf9e]">Sign out of every device?</span>
+              <span className="text-[13px] text-[var(--gv-warning)]">Sign out of every device?</span>
               <button type="button" onClick={handleSignOutEverywhere} disabled={signingOut} className="btn-primary text-[13px] disabled:opacity-50">
                 {signingOut ? 'Signing out…' : 'Yes, sign out everywhere'}
               </button>
@@ -151,7 +151,7 @@ export default function AccountSettings() {
               </button>
             </div>
           ) : (
-            <button type="button" onClick={() => setConfirmEverywhere(true)} className="btn-ghost text-[13px]" style={{ color: '#ffc2cc' }}>
+            <button type="button" onClick={() => setConfirmEverywhere(true)} className="btn-ghost text-[13px]" style={{ color: 'var(--gv-error)' }}>
               Sign out of all devices
             </button>
           )}

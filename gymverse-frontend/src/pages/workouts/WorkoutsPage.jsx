@@ -173,7 +173,7 @@ export default function WorkoutsPage() {
                   [BarChart2, 'Status', plan.status],
                 ].map(([Icon, label, value]) => (
                   <div key={label} className="flex items-center gap-2.5 text-[13px] text-ink-soft">
-                    <Icon size={14} className="shrink-0" style={{ color: 'var(--gv-accent)' }} />
+                    <Icon size={14} className="shrink-0" style={{ color: 'var(--color-primary)' }} />
                     <span className="min-w-0 flex-1">{label}</span>
                     <span className="truncate font-mono text-[12.5px] text-ink capitalize">{value}</span>
                   </div>

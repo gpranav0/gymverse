@@ -40,7 +40,7 @@ export default function HealthInformation({ memberId }) {
   return (
     <GlassPanel className="px-[22px] py-5">
       <div className="mb-4 flex items-center gap-2 border-b border-white/10 pb-3">
-        <HeartPulse size={18} style={{ color: 'var(--gv-accent)' }} />
+        <HeartPulse size={18} style={{ color: 'var(--color-primary)' }} />
         <h2 className="m-0 font-display text-[16.5px] font-semibold">Health information</h2>
       </div>
       <form onSubmit={save} className="flex flex-col gap-3.5">

@@ -166,10 +166,10 @@ export default function TrainersList() {
                 </Link>
                 {isAdmin && (
                   <>
-                    <button onClick={() => openEditModal(trainer)} className="btn-ghost" style={{ color: '#ffdf9e' }} title="Edit">
+                    <button onClick={() => openEditModal(trainer)} className="btn-ghost" style={{ color: 'var(--gv-warning)' }} title="Edit">
                       <Edit size={16} />
                     </button>
-                    <button onClick={() => handleDelete(trainer.trainer_id)} className="btn-ghost" style={{ color: '#ffc2cc' }} title="Delete">
+                    <button onClick={() => handleDelete(trainer.trainer_id)} className="btn-ghost" style={{ color: 'var(--gv-error)' }} title="Delete">
                       <Trash2 size={16} />
                     </button>
                   </>

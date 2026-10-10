@@ -104,7 +104,7 @@ export default function ClassSchedule() {
                     [Users, `${enrolled} / ${capacity} seats`],
                   ].map(([Icon, text], j) => (
                     <div key={j} className="flex items-center gap-2.5 font-mono text-[12.5px] text-ink-soft">
-                      <Icon size={14} className="shrink-0" style={{ color: 'var(--gv-accent)' }} />
+                      <Icon size={14} className="shrink-0" style={{ color: 'var(--color-primary)' }} />
                       <span className="truncate">{text}</span>
                     </div>
                   ))}

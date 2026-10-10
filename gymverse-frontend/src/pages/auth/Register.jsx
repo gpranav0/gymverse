@@ -86,7 +86,7 @@ export default function Register() {
 
         {error && (
           <div
-            className="mb-4 rounded-xl px-4 py-3 text-[13px] text-[#ffc2cc]"
+            className="mb-4 rounded-xl px-4 py-3 text-[13px] text-[var(--gv-error)]"
             style={{ background: 'rgb(251 113 133 / .14)', border: '1px solid rgb(251 113 133 / .36)' }}
           >
             {error}
@@ -95,7 +95,7 @@ export default function Register() {
 
         {success ? (
           <div
-            className="rounded-xl px-4 py-4 text-center text-[13.5px] text-[#8ff0cd]"
+            className="rounded-xl px-4 py-4 text-center text-[13.5px] text-[var(--gv-success)]"
             style={{ background: 'rgb(52 211 153 / .14)', border: '1px solid rgb(52 211 153 / .36)' }}
           >
             <p className="m-0 mb-3 font-semibold">{success}</p>

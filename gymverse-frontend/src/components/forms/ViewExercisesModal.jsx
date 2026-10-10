@@ -22,7 +22,7 @@ export default function ViewExercisesModal({ planId, onCancel }) {
   }, [planId]);
 
   if (loading) return <p className="p-4 text-center text-sm text-ink-muted">Loading exercises…</p>;
-  if (error) return <p className="p-4 text-center text-sm text-[#ffc2cc]">{error}</p>;
+  if (error) return <p className="p-4 text-center text-sm text-[var(--gv-error)]">{error}</p>;
 
   return (
     <div className="flex flex-col gap-4">

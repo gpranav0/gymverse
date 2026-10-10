@@ -29,7 +29,7 @@ export default function ScheduleForm({ classes, trainers, onSubmit, onCancel, lo
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      {error && <p role="alert" className="m-0 text-sm text-[#ffc2cc]">{error}</p>}
+      {error && <p role="alert" className="m-0 text-sm text-[var(--gv-error)]">{error}</p>}
       <div className="grid grid-cols-2 gap-4">
         <label className="flex flex-col gap-1.5">
           <span className="label-caps">Class</span>

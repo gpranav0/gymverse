@@ -1,8 +1,11 @@
+import { usePreferences } from '../../context/PreferencesContext';
+import { CurrencySelector } from '../../components/ui/PreferencesControls';
 import { useState, useEffect } from 'react';
 import { fmtDate } from '../../utils/dates';
 import Select from '../ui/Select';
 
 export default function PaymentActionModal({ payment, onSubmit, onCancel, loading }) {
+  const { money } = usePreferences();
   const [status, setStatus] = useState('pending');
 
   useEffect(() => {
@@ -20,11 +23,12 @@ export default function PaymentActionModal({ payment, onSubmit, onCancel, loadin
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <CurrencySelector />
       <div className="glass-inset grid grid-cols-2 gap-x-3 gap-y-2 px-4 py-3.5 text-sm">
         <div className="label-caps m-0">Payment ID</div>
         <div className="text-right font-mono text-ink">#{payment.payment_id}</div>
         <div className="label-caps m-0">Amount</div>
-        <div className="text-right font-mono text-ink">${parseFloat(payment.amount).toFixed(2)}</div>
+        <div className="text-right font-mono text-ink">{money(payment.amount)}</div>
         <div className="label-caps m-0">Date</div>
         <div className="text-right font-mono text-ink">{fmtDate(payment.payment_date)}</div>
       </div>

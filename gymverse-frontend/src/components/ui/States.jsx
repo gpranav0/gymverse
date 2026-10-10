@@ -4,7 +4,7 @@ import { Skeleton } from './Glass';
 export function ErrorNote({ children }) {
   return (
     <div
-      className="rounded-[18px] px-5 py-4 text-sm text-[#ffc2cc]"
+      className="rounded-[18px] px-5 py-4 text-sm text-danger"
       style={{
         background: 'rgb(251 113 133 / .12)',
         border: '1px solid rgb(251 113 133 / .34)',
@@ -80,7 +80,7 @@ export function SuccessNote({ children, onDismiss }) {
   return (
     <div
       role="status"
-      className="flex items-start justify-between gap-3 rounded-[18px] px-5 py-4 text-sm text-[#8ff0cd]"
+      className="flex items-start justify-between gap-3 rounded-[18px] px-5 py-4 text-sm text-[var(--gv-success)]"
       style={{
         background: 'rgb(52 211 153 / .12)',
         border: '1px solid rgb(52 211 153 / .34)',

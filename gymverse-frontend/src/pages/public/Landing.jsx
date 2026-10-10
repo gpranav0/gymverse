@@ -1,3 +1,5 @@
+import { usePreferences } from '../../context/PreferencesContext';
+import { CurrencySelector, ThemeToggle } from '../../components/ui/PreferencesControls';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, CalendarDays, Check, Dumbbell, Menu, MoveUpRight, ShieldCheck, Sparkles, X } from 'lucide-react';
@@ -19,7 +21,7 @@ const gallery = [
   { src: '/gymverse-coaching.jpg', alt: 'Male coach guiding a male member during a strength session', label: 'Personal coaching' },
 ];
 
-const money = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Number(value) || 0);
+
 const dateKey = (value) => String(value || '').slice(0, 10);
 const dayLabel = (value) => new Date(`${value}T12:00:00`).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric' });
 const timeLabel = (value) => String(value || '').slice(0, 5);
@@ -32,6 +34,7 @@ function SectionTitle({ eyebrow, title, description, action }) {
 }
 
 export default function Landing() {
+  const { money } = usePreferences();
   const { isAuthenticated } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [plans, setPlans] = useState([]);
@@ -87,7 +90,7 @@ export default function Landing() {
       <nav className={menuOpen ? 'landing-nav is-open' : 'landing-nav'} aria-label="Main navigation">
         <a href="#programs" onClick={() => setMenuOpen(false)}>Programs</a><a href="#membership" onClick={() => setMenuOpen(false)}>Membership</a><a href="#classes" onClick={() => setMenuOpen(false)}>Classes</a><a href="#experience" onClick={() => setMenuOpen(false)}>The experience</a>
       </nav>
-      <div className="landing-header-actions"><Link className="landing-signin" to={isAuthenticated ? '/dashboard' : '/login'}>{isAuthenticated ? 'Dashboard' : 'Sign in'}</Link><Link className="landing-header-cta" to={destination}>Join the movement <ArrowUpRight size={16} /></Link></div>
+      <div className="landing-header-actions"><ThemeToggle /><Link className="landing-signin" to={isAuthenticated ? '/dashboard' : '/login'}>{isAuthenticated ? 'Dashboard' : 'Sign in'}</Link><Link className="landing-header-cta" to={destination}>Join the movement <ArrowUpRight size={16} /></Link></div>
       <button className="landing-menu-button" type="button" onClick={() => setMenuOpen(open => !open)} aria-expanded={menuOpen} aria-label={menuOpen ? 'Close menu' : 'Open menu'}>{menuOpen ? <X /> : <Menu />}</button>
     </header>
 
@@ -111,6 +114,7 @@ export default function Landing() {
       <section className="landing-section landing-coaching"><div><p className="landing-eyebrow">Coaching with purpose</p><h2>GUIDANCE FOR<br /><em>YOUR NEXT LEVEL.</em></h2><p>Work with a trainer, follow an assigned plan, and bring more intention to each session. Meet the GymVerse team after signing in.</p><Link className="landing-text-link" to={isAuthenticated ? '/trainers' : '/login'}>Explore trainers <ArrowUpRight size={18} /></Link></div><img src="/gymverse-coaching.jpg" alt="Male coach guiding a male member through a lunge with dumbbells" loading="lazy" width="1672" height="941" /></section>
 
       <section id="membership" className="landing-section landing-memberships"><SectionTitle eyebrow="03 / Membership" title={<>YOUR GOALS. <em>YOUR PLAN.</em></>} description="Current membership options are loaded from the GymVerse catalogue." action={<div className="landing-toggle" role="group" aria-label="Plan duration"><button type="button" className={period === 'monthly' ? 'active' : ''} onClick={() => setPeriod('monthly')}>Monthly</button><button type="button" className={period === 'longer' ? 'active' : ''} onClick={() => setPeriod('longer')}>Multi-month</button></div>} />
+        <CurrencySelector />
         {plansState === 'loading' ? <div className="landing-loading-grid" aria-label="Loading plans">{[1, 2, 3].map(i => <div key={i} className="landing-skeleton" />)}</div> : plansState === 'error' ? <p className="landing-inline-state" role="alert">{plansError} <a href="#membership" onClick={() => window.location.reload()}>Try again</a></p> : visiblePlans.length ? <div className="landing-plan-grid">{visiblePlans.map((plan, index) => <article className={index === 1 ? 'landing-plan featured' : 'landing-plan'} key={plan.plan_id}><div className="landing-plan-top"><span>{index === 1 ? 'POPULAR CHOICE' : `PLAN 0${index + 1}`}</span><ArrowUpRight size={20} /></div><h3>{plan.plan_name}</h3><p className="landing-plan-description">{plan.description || 'A focused membership to keep your training moving.'}</p><div className="landing-plan-price"><strong>{money(plan.price)}</strong><span> / {Number(plan.duration_months) === 1 ? 'month' : `${plan.duration_months} months`}</span></div><div className="landing-plan-divider" /><p className="landing-plan-access"><Check size={17} /> {plan.access_level || 'Gym access'}</p><Link className={index === 1 ? 'landing-button landing-button-primary' : 'landing-button landing-button-outline'} to={destination}>Choose this plan <ArrowUpRight size={17} /></Link></article>)}</div> : <p className="landing-inline-state">No {period === 'monthly' ? 'monthly' : 'multi-month'} plans are currently available. <button type="button" onClick={() => setPeriod(period === 'monthly' ? 'longer' : 'monthly')}>See other plans</button></p>}
       </section>
 

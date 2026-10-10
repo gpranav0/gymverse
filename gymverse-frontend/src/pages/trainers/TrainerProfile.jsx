@@ -116,7 +116,7 @@ export default function TrainerProfile() {
         <div className="flex min-w-0 flex-col gap-4">
           <GlassPanel delay={80} className="px-[22px] py-5">
             <div className="mb-4 flex items-center gap-2 border-b border-white/10 pb-3">
-              <Calendar size={18} style={{ color: 'var(--gv-accent)' }} />
+              <Calendar size={18} style={{ color: 'var(--color-primary)' }} />
               <h3 className="m-0 font-display text-[16.5px] font-semibold tracking-[-.2px]">Upcoming classes</h3>
             </div>
             {classes.length > 0 ? (
@@ -137,7 +137,7 @@ export default function TrainerProfile() {
 
           <GlassPanel delay={160} className="px-[22px] py-5">
             <div className="mb-4 flex items-center gap-2 border-b border-white/10 pb-3">
-              <Award size={18} style={{ color: 'var(--gv-accent)' }} />
+              <Award size={18} style={{ color: 'var(--color-primary)' }} />
               <h3 className="m-0 font-display text-[16.5px] font-semibold tracking-[-.2px]">Qualifications</h3>
             </div>
             <dl className="m-0 grid gap-2.5 [grid-template-columns:repeat(auto-fit,minmax(150px,1fr))]">

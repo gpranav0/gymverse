@@ -24,7 +24,7 @@ export default function CheckInOutForm({ onAction, onCancel, loading }) {
   }, []);
 
   if (fetching) return <p className="p-4 text-center text-sm text-ink-muted">Loading members…</p>;
-  if (error) return <p className="p-4 text-center text-sm text-[#ffc2cc]">{error}</p>;
+  if (error) return <p className="p-4 text-center text-sm text-[var(--gv-error)]">{error}</p>;
 
   return (
     <div className="flex flex-col gap-4">
@@ -55,7 +55,7 @@ export default function CheckInOutForm({ onAction, onCancel, loading }) {
             onClick={() => onAction('out', selectedMember)}
             disabled={loading || !selectedMember}
             className="rounded-[11px] border px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50"
-            style={{ color: '#ffc2cc', background: 'rgb(251 113 133 / .12)', borderColor: 'rgb(251 113 133 / .3)' }}
+            style={{ color: 'var(--gv-error)', background: 'rgb(251 113 133 / .12)', borderColor: 'rgb(251 113 133 / .3)' }}
           >
             Check out
           </button>

@@ -1,0 +1,78 @@
+.theme-toggle { display: inline-grid; place-items: center; flex: none; width: 38px; height: 38px; border: 1px solid #526064; border-radius: 10px; background: #151a1d; color: #f5f7fa; cursor: pointer; }
+.theme-toggle:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.currency-selector { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; max-width: 100%; }
+.currency-selector-field { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.currency-selector-field > div { width: 225px; max-width: 100%; }
+.currency-selector small { font-size: 11px; }
+.currency-selector small button { text-decoration: underline; cursor: pointer; }
+.auth-theme-control { position: absolute; top: 24px; left: 30px; }
+[data-theme] .landing-header-actions { gap: 14px; }
+
+/* Semantic tokens keep controls and portal menus consistent across both themes. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-ink: #182326;
+  --color-ink-soft: #425458;
+  --color-ink-muted: #5b6c71;
+  --color-primary: #426600;
+  --color-secondary: #b83213;
+  --color-warn: #885900;
+  --color-danger: #b72241;
+  --color-violet: #6840ad;
+  --gv-dropdown: linear-gradient(155deg, #ffffff, #edf2f3);
+  --gv-success: #087349;
+  --gv-error: #b72241;
+  --gv-warning: #885900;
+  --gv-info: #285bb0;
+}
+[data-theme="light"] body, [data-theme="light"] .landing-page, [data-theme="light"] .app-shell, [data-theme="light"] .auth-layout { background: #f4f7f5; color: var(--color-ink); }
+[data-theme="light"] a { color: var(--color-primary); }
+[data-theme="light"] a:hover { color: #304d00; }
+[data-theme="light"] .glass, [data-theme="light"] .glass-flat { background: linear-gradient(155deg, #fff, #f1f5f2); border-color: #d0dad5; box-shadow: 0 18px 40px -28px rgb(24 50 35 / .3); }
+[data-theme="light"] .glass-inset, [data-theme="light"] .field, [data-theme="light"] .auth-form-wrap .field { background: #edf2ef; border-color: #bdccc3; }
+[data-theme="light"] .field:focus { border-color: var(--color-primary); }
+[data-theme="light"] .btn-ghost { color: var(--color-ink); border-color: #c1cfc7; background: #e7eee9; }
+[data-theme="light"] .btn-ghost:hover { background: #d9e5dc; }
+[data-theme="light"] .label-caps { color: var(--color-ink-muted); }
+[data-theme="light"] [class*="border-white/"] { border-color: #cbd7cf; }
+[data-theme="light"] [class*="bg-white/"] { background-color: rgb(32 60 42 / .06); }
+[data-theme="light"] .app-sidebar, [data-theme="light"] .app-topbar { background: rgb(255 255 255 / .96); border-color: #d0dad5; }
+[data-theme="light"] .app-sidebar-top, [data-theme="light"] .app-sidebar-bottom { border-color: #d0dad5; }
+[data-theme="light"] .app-logo, [data-theme="light"] .app-user, [data-theme="light"] .app-sidebar-close { color: var(--color-ink); }
+[data-theme="light"] .app-nav-group > p, [data-theme="light"] .app-user-copy small { color: var(--color-ink-muted); }
+[data-theme="light"] .app-nav-link, [data-theme="light"] .app-collapse-button, [data-theme="light"] .app-mobile-menu { color: var(--color-ink-soft); }
+[data-theme="light"] .app-nav-link:hover { background: #e7eee9; color: var(--color-ink); }
+[data-theme="light"] .app-nav-link.is-active { background: #e2edcd; color: var(--color-primary); box-shadow: inset 3px 0 var(--color-primary); }
+[data-theme="light"] .app-sidebar-promo { background: #e7efda; border-color: #bacda0; }
+[data-theme="light"] .app-sidebar-promo > span, [data-theme="light"] .app-breadcrumb span, [data-theme="light"] .app-logo > span:last-child span { color: var(--color-primary); }
+[data-theme="light"] .app-search { background: #edf2ef; border-color: #bdccc3; color: var(--color-ink-muted); }
+[data-theme="light"] .app-search input { color: var(--color-ink); }
+[data-theme="light"] .theme-toggle { background: #edf2ef; border-color: #bdccc3; color: var(--color-ink); }
+[data-theme="light"] .landing-header { background: rgb(255 255 255 / .95); border-color: #cbd7cf; }
+[data-theme="light"] .landing-brand, [data-theme="light"] .landing-nav a, [data-theme="light"] .landing-signin, [data-theme="light"] .landing-menu-button { color: var(--color-ink); }
+@media (max-width: 760px) { [data-theme="light"] .landing-nav { background: #fff; } }
+[data-theme="light"] .landing-header-cta, [data-theme="light"] .landing-button-primary, [data-theme="light"] .landing-mobile-cta a { color: #080a0d; }
+/* Text over photographic banners needs the same contrast in either theme. */
+[data-theme="light"] .landing-hero, [data-theme="light"] .auth-showcase, [data-theme="light"] .dashboard-welcome { color: #fff; }
+[data-theme="light"] .landing-hero a.landing-button-outline, [data-theme="light"] .dashboard-welcome-actions a + a, [data-theme="light"] .auth-showcase-logo { color: #fff; }
+[data-theme="light"] .landing-program { background: #e5ece7; color: var(--color-ink); border-color: #bdccc3; }
+[data-theme="light"] .landing-program::before { opacity: .08; }
+[data-theme="light"] .landing-program:hover::before { opacity: .15; }
+[data-theme="light"] .landing-program-index, [data-theme="light"] .landing-program > svg, [data-theme="light"] .landing-plan-top, [data-theme="light"] .landing-text-link, [data-theme="light"] .landing-plan-access svg, [data-theme="light"] .landing-schedule-time, [data-theme="light"] .landing-seats { color: var(--color-primary); }
+[data-theme="light"] .landing-experience, [data-theme="light"] .landing-plan, [data-theme="light"] .landing-inline-state { background: #fff; border-color: #cbd7cf; }
+[data-theme="light"] .landing-plan.featured { background: linear-gradient(160deg, #edf5dc, #fff); border-color: #7ca245; }
+[data-theme="light"] .landing-plan .landing-button-outline { color: var(--color-primary); border-color: #8da56d; }
+[data-theme="light"] .landing-section-description, [data-theme="light"] .landing-program p, [data-theme="light"] .landing-experience-copy > p:not(.landing-eyebrow), [data-theme="light"] .landing-experience-points small, [data-theme="light"] .landing-plan-description, [data-theme="light"] .landing-plan-price span, [data-theme="light"] .landing-plan-access, [data-theme="light"] .landing-schedule-name p, [data-theme="light"] .landing-footer p, [data-theme="light"] .landing-footer small, [data-theme="light"] .landing-footer > div a, [data-theme="light"] .landing-coaching > div > p:not(.landing-eyebrow), [data-theme="light"] .auth-subtitle, [data-theme="light"] .auth-back-home { color: var(--color-ink-soft); }
+[data-theme="light"] .landing-section .landing-eyebrow, [data-theme="light"] .landing-experience .landing-eyebrow, [data-theme="light"] .landing-final .landing-eyebrow, [data-theme="light"] .auth-form-wrap .landing-eyebrow, [data-theme="light"] .landing-section em, [data-theme="light"] .landing-experience em, [data-theme="light"] .landing-final em { color: var(--color-primary); }
+[data-theme="light"] .landing-toggle, [data-theme="light"] .landing-mobile-cta { background: #e7eee9; border-color: #bdccc3; }
+[data-theme="light"] .landing-toggle button, [data-theme="light"] .landing-day-tabs button { color: var(--color-ink-soft); }
+[data-theme="light"] .landing-toggle button.active, [data-theme="light"] .landing-day-tabs button.active { color: #080a0d; }
+[data-theme="light"] .landing-final { background: radial-gradient(circle at center, #e2edcd, #f4f7f5 65%); }
+[data-theme="light"] .landing-final > p:not(.landing-eyebrow) { color: var(--color-ink-soft); }
+[data-theme="light"] .landing-schedule-action { color: var(--color-ink); border-color: #bdccc3; }
+[data-theme="light"] .landing-plan-divider { background: #cbd7cf; }
+[data-theme="light"] .landing-schedule-row, [data-theme="light"] .landing-footer, [data-theme="light"] .landing-experience-points, [data-theme="light"] .landing-experience-points > div { border-color: #cbd7cf; }
+[data-theme="light"] .auth-mobile-brand { color: var(--color-ink); }
+[data-theme="light"] .landing-inline-state { color: var(--color-ink-soft); }
+[data-theme="light"] .landing-inline-state a, [data-theme="light"] .landing-inline-state button { color: var(--color-primary); }
+@media (max-width: 480px) { [data-theme] .landing-header { gap: 10px; padding-inline: 16px; } [data-theme] .landing-header-actions { gap: 10px; } .auth-theme-control { top: 17px; left: 24px; } }

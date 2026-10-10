@@ -123,7 +123,7 @@ export default function ConversationPicker({
           onBlur={(event) => { if (!rootRef.current?.contains(event.relatedTarget)) setOpen(false); }}
           className="absolute left-0 right-0 top-[calc(100%+6px)] z-20 max-h-60 overflow-y-auto rounded-xl border border-white/12 p-1.5 outline-none"
           style={{
-            background: 'linear-gradient(155deg, rgb(24 34 56 / .98), rgb(9 13 24 / .98))',
+            background: 'var(--gv-dropdown)',
             backdropFilter: 'blur(var(--gv-blur)) saturate(150%)',
             boxShadow: '0 22px 48px -18px rgb(0 0 0 / .85), inset 0 1px 0 rgb(255 255 255 / .1)',
             animation: 'var(--animate-rise-in)',

@@ -1,3 +1,5 @@
+import { usePreferences } from '../../context/PreferencesContext';
+import { CurrencySelector } from '../../components/ui/PreferencesControls';
 import { useState, useEffect, useCallback } from 'react';
 import { getMembershipPlans, createMembershipPlan, updateMembershipPlan, createSubscription } from '../../services/membershipService';
 import { getErrorMessage } from '../../services/api';
@@ -17,6 +19,7 @@ const GLOWS = [
 ];
 
 export default function MembershipPlans() {
+  const { money } = usePreferences();
   const { user } = useAuth();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -105,7 +108,7 @@ export default function MembershipPlans() {
 
   const feature = (on, label) => (
     <div className="flex items-center gap-2.5 text-[13px]" style={{ color: on ? 'var(--color-ink-soft)' : '#7c879b' }}>
-      {on ? <Check size={15} style={{ color: '#8ff0cd' }} /> : <X size={15} style={{ color: '#7c879b' }} />}
+      {on ? <Check size={15} style={{ color: 'var(--gv-success)' }} /> : <X size={15} style={{ color: '#7c879b' }} />}
       <span style={{ textDecoration: on ? 'none' : 'line-through' }}>{label}</span>
     </div>
   );
@@ -113,6 +116,7 @@ export default function MembershipPlans() {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader title="Membership plans" subtitle="Pricing, access level and included personal training">
+        <CurrencySelector />
         {isAdmin && (
           <button onClick={openCreateModal} className="btn-primary text-[13.5px]">
             + New plan
@@ -154,7 +158,7 @@ export default function MembershipPlans() {
 
               <div className="relative flex items-baseline gap-1.5">
                 <span className="font-display text-[32px] font-bold tracking-[-1.2px]">
-                  ${parseFloat(plan.price).toFixed(2)}
+                  {money(plan.price)}
                 </span>
                 <span className="text-[13px] text-ink-muted">/ {plan.duration_months} mo</span>
               </div>

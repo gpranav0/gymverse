@@ -59,7 +59,7 @@ export default function AssignWorkoutForm({ plan, onSubmit, onCancel, loading })
   };
 
   if (fetching) return <p className="p-4 text-center text-sm text-ink-muted">Loading members…</p>;
-  if (error) return <p className="p-4 text-center text-sm text-[#ffc2cc]">{error}</p>;
+  if (error) return <p className="p-4 text-center text-sm text-[var(--gv-error)]">{error}</p>;
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">

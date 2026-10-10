@@ -161,7 +161,7 @@ function AccountChat() {
           aria-labelledby="gymverse-chat-title"
           className="gymverse-chat-window glass flex h-[520px] max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] flex-col overflow-hidden sm:w-[380px]"
           style={{
-            background: 'linear-gradient(155deg, #1a211c, #0b1010)',
+            background: 'var(--gv-dropdown)',
             animation: 'var(--animate-rise-in)',
           }}
         >

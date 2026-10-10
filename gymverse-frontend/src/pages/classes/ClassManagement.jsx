@@ -124,8 +124,8 @@ export default function ClassManagement() {
       key: 'actions', label: '', width: 'auto', align: 'end',
       render: (c) => (
         <div className="flex gap-2">
-          <button type="button" className="btn-ghost" title="Edit class" style={{ color: '#ffdf9e' }} onClick={() => openModal('class', c)}><Edit size={16} /></button>
-          <button type="button" className="btn-ghost disabled:opacity-50" title="Delete class" style={{ color: '#ffc2cc' }} disabled={busyKey === `class-${c.class_id}`} onClick={() => handleDeleteClass(c)}><Trash2 size={16} /></button>
+          <button type="button" className="btn-ghost" title="Edit class" style={{ color: 'var(--gv-warning)' }} onClick={() => openModal('class', c)}><Edit size={16} /></button>
+          <button type="button" className="btn-ghost disabled:opacity-50" title="Delete class" style={{ color: 'var(--gv-error)' }} disabled={busyKey === `class-${c.class_id}`} onClick={() => handleDeleteClass(c)}><Trash2 size={16} /></button>
         </div>
       ),
     },
@@ -143,7 +143,7 @@ export default function ClassManagement() {
       render: (s) => (s.status === 'scheduled' ? (
         <div className="flex gap-2">
           <button type="button" className="btn-ghost text-[12.5px]" title="Edit session" onClick={() => openModal('editSchedule', s)}>Edit</button>
-          <button type="button" className="btn-ghost text-[12.5px] disabled:opacity-50" title="Cancel session" style={{ color: '#ffc2cc' }} disabled={busyKey === `session-${s.schedule_id}`} onClick={() => handleCancelSession(s)}>Cancel</button>
+          <button type="button" className="btn-ghost text-[12.5px] disabled:opacity-50" title="Cancel session" style={{ color: 'var(--gv-error)' }} disabled={busyKey === `session-${s.schedule_id}`} onClick={() => handleCancelSession(s)}>Cancel</button>
         </div>
       ) : null),
     },

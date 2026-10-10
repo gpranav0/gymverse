@@ -1,9 +1,12 @@
+import { usePreferences } from '../../context/PreferencesContext';
+import { CurrencySelector } from '../../components/ui/PreferencesControls';
 import { useState, useEffect } from 'react';
 import { getMembers } from '../../services/memberService';
 import { getErrorMessage } from '../../services/api';
 import Select from '../ui/Select';
 
 export default function AssignSubscriptionForm({ plan, onSubmit, onCancel, loading }) {
+  const { money } = usePreferences();
   const [members, setMembers] = useState([]);
   const [selectedMember, setSelectedMember] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cash');
@@ -37,13 +40,14 @@ export default function AssignSubscriptionForm({ plan, onSubmit, onCancel, loadi
   };
 
   if (fetching) return <p className="p-4 text-center text-sm text-ink-muted">Loading members…</p>;
-  if (error) return <p className="p-4 text-center text-sm text-[#ffc2cc]">{error}</p>;
+  if (error) return <p className="p-4 text-center text-sm text-danger">{error}</p>;
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <CurrencySelector />
       <div className="glass-inset px-4 py-3.5">
         <div className="label-caps m-0">Selected plan</div>
-        <p className="m-0 mt-1 text-sm text-ink">{plan.plan_name} — ${parseFloat(plan.price).toFixed(2)}</p>
+        <p className="m-0 mt-1 text-sm text-ink">{plan.plan_name} — {money(plan.price)}</p>
       </div>
 
       <label className="flex flex-col gap-1.5">

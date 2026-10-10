@@ -64,7 +64,7 @@ export default function WorkoutPlanForm({ onSubmit, onCancel, loading }) {
               </option>
             ))}
           </Select>
-          {trainerError && <span className="text-xs text-[#ffc2cc]">{trainerError}</span>}
+          {trainerError && <span className="text-xs text-[var(--gv-error)]">{trainerError}</span>}
         </label>
       )}
 

@@ -1,3 +1,4 @@
+import { ThemeToggle } from './PreferencesControls';
 import { Dumbbell, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useGlassTheme } from './Glass';
@@ -9,14 +10,14 @@ export default function AuthShell({ title, subtitle, maxWidth = 420, children })
   return (
     <div className="auth-layout">
       <div className="auth-showcase"><Link to="/" className="auth-showcase-logo"><Dumbbell size={22} /> GYMVERSE<span>.</span></Link><div><p>THE WORK STARTS HERE</p><h2>EVERY REP.<br />EVERY MILE.<br /><em>EVERY DAY.</em></h2><span>More than a membership. A place to find your momentum.</span></div></div>
-      <div className="auth-form-side"><Link to="/" className="auth-back-home">Back to the club <ArrowUpRight size={16} /></Link><div className="auth-form-wrap" style={{ maxWidth }}><div className="auth-mobile-brand"><Dumbbell size={21} /> GYMVERSE<span>.</span></div><p className="landing-eyebrow">WELCOME TO GYMVERSE</p><h1>{title}</h1>{subtitle && <p className="auth-subtitle">{subtitle}</p>}{children}</div></div>
+      <div className="auth-form-side"><div className="auth-theme-control"><ThemeToggle /></div><Link to="/" className="auth-back-home">Back to the club <ArrowUpRight size={16} /></Link><div className="auth-form-wrap" style={{ maxWidth }}><div className="auth-mobile-brand"><Dumbbell size={21} /> GYMVERSE<span>.</span></div><p className="landing-eyebrow">WELCOME TO GYMVERSE</p><h1>{title}</h1>{subtitle && <p className="auth-subtitle">{subtitle}</p>}{children}</div></div>
     </div>
   );
 }
 
 const TONES = {
-  error: ['rgb(251 113 133 / .14)', 'rgb(251 113 133 / .36)', '#ffc2cc'],
-  success: ['rgb(52 211 153 / .14)', 'rgb(52 211 153 / .36)', '#8ff0cd'],
+  error: ['rgb(251 113 133 / .14)', 'rgb(251 113 133 / .36)', 'var(--gv-error)'],
+  success: ['rgb(52 211 153 / .14)', 'rgb(52 211 153 / .36)', 'var(--gv-success)'],
 };
 
 /** Inline message inside an AuthShell card. */

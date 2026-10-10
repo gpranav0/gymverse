@@ -45,7 +45,7 @@ export default function WorkoutSessionForm({ plans = [], onSubmit, onCancel, loa
   };
 
   if (fetching) return <p className="p-4 text-center text-sm text-ink-muted">Loading your members…</p>;
-  if (loadError) return <p className="p-4 text-center text-sm text-[#ffc2cc]">{loadError}</p>;
+  if (loadError) return <p className="p-4 text-center text-sm text-[var(--gv-error)]">{loadError}</p>;
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">

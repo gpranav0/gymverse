@@ -3,6 +3,19 @@
 The React single-page app for GymVerse, a gym management system. It talks to the
 Express API in `../gymverse-backend`.
 
+## Theme and currency preferences
+
+The sun/moon button switches between light and dark themes on public, authentication,
+and dashboard pages. Theme and currency choices are saved in browser local storage.
+
+Currency selectors support USD, INR, EUR, GBP, JPY, CAD, AUD, CHF, and CNY. Existing
+database amounts use USD as the base currency. Displayed prices, payment amounts,
+dashboard revenue, and CSV exports convert using the latest daily rates from
+[Frankfurter](https://frankfurter.dev). The selector shows the rate date. If rates
+cannot be loaded, amounts retain their USD labels and the selector offers a retry.
+Plan editing keeps the original USD price and shows a converted preview; billing
+and database values remain in USD.
+
 ## Tech Stack
 - **React 19** with **React Router 7**
 - **Vite** for dev server and builds

@@ -6,11 +6,11 @@ const GLOWS = {
   violet: 'radial-gradient(circle, rgb(255 92 53 / .5), transparent 68%)',
   amber: 'radial-gradient(circle, rgb(255 180 78 / .6), transparent 68%)',
 };
-const TINTS = { blue: '#c7ff35', green: '#8ff0cd', violet: '#ff937b', amber: '#ffdf9e' };
+const TINTS = { blue: 'var(--color-primary)', green: 'var(--gv-success)', violet: 'var(--color-secondary)', amber: 'var(--gv-warning)' };
 const TRENDS = {
-  up: ['rgb(52 211 153 / .16)', 'rgb(52 211 153 / .4)', '#8ff0cd'],
-  warn: ['rgb(251 191 36 / .16)', 'rgb(251 191 36 / .42)', '#ffdf9e'],
-  flat: ['rgb(255 255 255 / .07)', 'rgb(255 255 255 / .16)', '#cfd8e8'],
+  up: ['rgb(52 211 153 / .16)', 'rgb(52 211 153 / .4)', 'var(--gv-success)'],
+  warn: ['rgb(251 191 36 / .16)', 'rgb(251 191 36 / .42)', 'var(--gv-warning)'],
+  flat: ['rgb(255 255 255 / .07)', 'rgb(255 255 255 / .16)', 'var(--color-ink-soft)'],
 };
 
 /**

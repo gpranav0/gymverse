@@ -90,8 +90,8 @@ export default function ExercisesPage() {
       key: 'actions', label: '', width: 'auto', align: 'end',
       render: (r) => (
         <div className="flex gap-2">
-          <button type="button" className="btn-ghost" title="Edit exercise" style={{ color: '#ffdf9e' }} onClick={() => { setFormError(null); setModal({ exercise: r }); }}><Edit size={16} /></button>
-          {canDelete && <button type="button" className="btn-ghost" title="Delete exercise" style={{ color: '#ffc2cc' }} onClick={() => handleDelete(r)}><Trash2 size={16} /></button>}
+          <button type="button" className="btn-ghost" title="Edit exercise" style={{ color: 'var(--gv-warning)' }} onClick={() => { setFormError(null); setModal({ exercise: r }); }}><Edit size={16} /></button>
+          {canDelete && <button type="button" className="btn-ghost" title="Delete exercise" style={{ color: 'var(--gv-error)' }} onClick={() => handleDelete(r)}><Trash2 size={16} /></button>}
         </div>
       ),
     }] : []),

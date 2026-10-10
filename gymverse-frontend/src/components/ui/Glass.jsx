@@ -14,18 +14,18 @@ export function GlassPanel({ as: Tag = 'div', delay = 0, hover = false, classNam
 }
 
 const PILL = {
-  active: ['rgb(52 211 153 / .16)', 'rgb(52 211 153 / .4)', '#8ff0cd'],
-  available: ['rgb(52 211 153 / .16)', 'rgb(52 211 153 / .4)', '#8ff0cd'],
-  paid: ['rgb(52 211 153 / .16)', 'rgb(52 211 153 / .4)', '#8ff0cd'],
-  'on floor': ['rgb(77 141 255 / .18)', 'rgb(77 141 255 / .42)', '#bcd6ff'],
-  'in session': ['rgb(77 141 255 / .18)', 'rgb(77 141 255 / .42)', '#bcd6ff'],
-  expiring: ['rgb(251 191 36 / .16)', 'rgb(251 191 36 / .42)', '#ffdf9e'],
-  pending: ['rgb(251 191 36 / .16)', 'rgb(251 191 36 / .42)', '#ffdf9e'],
-  paused: ['rgb(251 191 36 / .14)', 'rgb(251 191 36 / .36)', '#ffe2ab'],
-  expired: ['rgb(251 113 133 / .16)', 'rgb(251 113 133 / .42)', '#ffc2cc'],
-  failed: ['rgb(251 113 133 / .16)', 'rgb(251 113 133 / .42)', '#ffc2cc'],
-  refunded: ['rgb(167 139 250 / .16)', 'rgb(167 139 250 / .42)', '#d8ccff'],
-  neutral: ['rgb(255 255 255 / .07)', 'rgb(255 255 255 / .15)', '#cfd8e8'],
+  active: ['rgb(52 211 153 / .16)', 'rgb(52 211 153 / .4)', 'var(--gv-success)'],
+  available: ['rgb(52 211 153 / .16)', 'rgb(52 211 153 / .4)', 'var(--gv-success)'],
+  paid: ['rgb(52 211 153 / .16)', 'rgb(52 211 153 / .4)', 'var(--gv-success)'],
+  'on floor': ['rgb(77 141 255 / .18)', 'rgb(77 141 255 / .42)', 'var(--gv-info)'],
+  'in session': ['rgb(77 141 255 / .18)', 'rgb(77 141 255 / .42)', 'var(--gv-info)'],
+  expiring: ['rgb(251 191 36 / .16)', 'rgb(251 191 36 / .42)', 'var(--gv-warning)'],
+  pending: ['rgb(251 191 36 / .16)', 'rgb(251 191 36 / .42)', 'var(--gv-warning)'],
+  paused: ['rgb(251 191 36 / .14)', 'rgb(251 191 36 / .36)', 'var(--gv-warning)'],
+  expired: ['rgb(251 113 133 / .16)', 'rgb(251 113 133 / .42)', 'var(--gv-error)'],
+  failed: ['rgb(251 113 133 / .16)', 'rgb(251 113 133 / .42)', 'var(--gv-error)'],
+  refunded: ['rgb(167 139 250 / .16)', 'rgb(167 139 250 / .42)', 'var(--color-violet)'],
+  neutral: ['rgb(255 255 255 / .07)', 'rgb(255 255 255 / .15)', 'var(--color-ink-soft)'],
 };
 
 /** Status pill. Tinted border + light text keeps AA contrast on dark glass. */

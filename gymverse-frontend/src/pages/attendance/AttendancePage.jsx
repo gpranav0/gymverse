@@ -75,12 +75,12 @@ export default function AttendancePage() {
       ),
     },
     { key: 'date', label: 'Date', mono: true, render: (r) => fmtDate(r.attendance_date) },
-    { key: 'in', label: 'Check in', mono: true, render: (r) => <span style={{ color: '#8ff0cd' }}>{r.check_in_time}</span> },
+    { key: 'in', label: 'Check in', mono: true, render: (r) => <span style={{ color: 'var(--gv-success)' }}>{r.check_in_time}</span> },
     {
       key: 'out',
       label: 'Check out',
       mono: true,
-      render: (r) => (r.check_out_time ? r.check_out_time : <span style={{ color: '#ffdf9e' }}>—</span>),
+      render: (r) => (r.check_out_time ? r.check_out_time : <span style={{ color: 'var(--gv-warning)' }}>—</span>),
     },
     { key: 'method', label: 'Method', render: (r) => <span className="capitalize">{r.check_in_method}</span> },
     {

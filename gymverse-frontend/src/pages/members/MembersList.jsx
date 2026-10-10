@@ -135,10 +135,10 @@ export default function MembersList() {
           </Link>
           {canManage && (
             <>
-              <button onClick={() => openEditModal(m)} className="btn-ghost" title="Edit" style={{ color: '#ffdf9e' }}>
+              <button onClick={() => openEditModal(m)} className="btn-ghost" title="Edit" style={{ color: 'var(--gv-warning)' }}>
                 <Edit size={16} />
               </button>
-              <button onClick={() => handleDelete(m.member_id)} className="btn-ghost" title="Delete" style={{ color: '#ffc2cc' }}>
+              <button onClick={() => handleDelete(m.member_id)} className="btn-ghost" title="Delete" style={{ color: 'var(--gv-error)' }}>
                 <Trash2 size={16} />
               </button>
             </>

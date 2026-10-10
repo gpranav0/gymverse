@@ -283,7 +283,7 @@ export default function Select({
             minWidth: position.width,
             maxWidth: `max(${position.width}px, min(28rem, calc(100vw - ${position.left + 12}px)))`,
             maxHeight: position.maxHeight,
-            background: 'linear-gradient(155deg, rgb(24 34 56 / .98), rgb(9 13 24 / .98))',
+            background: 'var(--gv-dropdown)',
             backdropFilter: 'blur(var(--gv-blur)) saturate(150%)',
             WebkitBackdropFilter: 'blur(var(--gv-blur)) saturate(150%)',
             boxShadow: '0 22px 48px -18px rgb(0 0 0 / .85), inset 0 1px 0 rgb(255 255 255 / .1)',

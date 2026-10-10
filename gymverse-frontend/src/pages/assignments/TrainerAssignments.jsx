@@ -110,7 +110,7 @@ export default function TrainerAssignments() {
           <button type="button" className="btn-ghost text-[12.5px] disabled:opacity-50" disabled={busyId === r.assignment_id} onClick={() => changeStatus(r, 'completed')}>
             End
           </button>
-          <button type="button" className="btn-ghost text-[12.5px] disabled:opacity-50" style={{ color: '#ffc2cc' }} disabled={busyId === r.assignment_id} onClick={() => changeStatus(r, 'cancelled')}>
+          <button type="button" className="btn-ghost text-[12.5px] disabled:opacity-50" style={{ color: 'var(--gv-error)' }} disabled={busyId === r.assignment_id} onClick={() => changeStatus(r, 'cancelled')}>
             Cancel
           </button>
         </div>

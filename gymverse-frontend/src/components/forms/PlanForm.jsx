@@ -1,7 +1,10 @@
+import { usePreferences } from '../../context/PreferencesContext';
+import { CurrencySelector } from '../ui/PreferencesControls';
 import { useState, useEffect } from 'react';
 import Select from '../ui/Select';
 
 export default function PlanForm({ initialData, onSubmit, onCancel, loading }) {
+  const { money, displayCurrency } = usePreferences();
   const [formData, setFormData] = useState({
     plan_name: '',
     description: '',
@@ -45,13 +48,15 @@ export default function PlanForm({ initialData, onSubmit, onCancel, loading }) {
         <textarea name="description" value={formData.description || ''} onChange={handleChange} rows="2" className="field text-sm" />
       </label>
 
+      <CurrencySelector />
+      <p className="text-sm text-ink-soft" role="status">Preview: {money(formData.price)} {displayCurrency}. Prices are saved and billed in USD.</p>
       <div className="grid grid-cols-2 gap-4">
         <label className="flex flex-col gap-1.5">
           <span className="label-caps">Duration (months) *</span>
           <input required type="number" min="1" name="duration_months" value={formData.duration_months} onChange={handleChange} className="field text-sm" />
         </label>
         <label className="flex flex-col gap-1.5">
-          <span className="label-caps">Price *</span>
+          <span className="label-caps">Price (USD) *</span>
           <input required type="number" min="0" step="0.01" name="price" value={formData.price} onChange={handleChange} className="field text-sm" />
         </label>
       </div>

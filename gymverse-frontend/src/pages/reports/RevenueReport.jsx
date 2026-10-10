@@ -1,3 +1,5 @@
+import { usePreferences } from '../../context/PreferencesContext';
+import { CurrencySelector } from '../../components/ui/PreferencesControls';
 import { useState, useEffect } from 'react';
 import { getRevenueReport } from '../../services/reportService';
 import { fmtDate, toLocalDay, todayLocal } from '../../utils/dates';
@@ -15,6 +17,7 @@ const csvCell = (value) => {
 };
 
 export default function RevenueReport() {
+  const { money, convert, displayCurrency } = usePreferences();
   const [reportData, setReportData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -52,9 +55,9 @@ export default function RevenueReport() {
 
   const handleExportCSV = () => {
     if (filteredData.length === 0) return;
-    const header = 'Member Name,Plan,Amount,Payment Method,Date';
+    const header = `Member Name,Plan,Amount (${displayCurrency}),Payment Method,Date`;
     const rows = filteredData.map((row) =>
-      [csvCell(row.member_name), csvCell(row.plan_name), row.amount, csvCell(row.payment_method), csvCell(fmtDate(row.payment_date))].join(','),
+      [csvCell(row.member_name), csvCell(row.plan_name), convert(row.amount).toFixed(new Intl.NumberFormat('en-US', { style: 'currency', currency: displayCurrency }).resolvedOptions().maximumFractionDigits), csvCell(row.payment_method), csvCell(fmtDate(row.payment_date))].join(','),
     );
     // A Blob rather than a data: URI, which cut the file short at the first '#' in a name.
     const url = URL.createObjectURL(new Blob([[header, ...rows].join('\n')], { type: 'text/csv;charset=utf-8' }));
@@ -88,7 +91,7 @@ export default function RevenueReport() {
       label: 'Amount',
       render: (r) => (
         <span className="font-display text-[15px] font-bold tracking-[-.3px] text-ink">
-          ${parseFloat(r.amount).toFixed(2)}
+          {money(r.amount)}
         </span>
       ),
     },
@@ -99,6 +102,7 @@ export default function RevenueReport() {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader title="Revenue report" subtitle="Collected payments, filterable by date">
+        <CurrencySelector />
         <div className="flex items-center gap-2 rounded-xl border border-white/13 bg-white/5 px-3.5 py-2.5 font-mono text-[12.5px] text-ink-soft">
           <Filter size={15} className="text-ink-muted" />
           <input
@@ -145,7 +149,8 @@ export default function RevenueReport() {
 }
 
 function TotalCard({ total, count }) {
-  const animated = useCountUp(Math.round(total));
+  const { money } = usePreferences();
+  const animated = useCountUp(Math.round(total * 100)) / 100;
   return (
     <GlassPanel className="relative flex items-center justify-between gap-4 overflow-hidden px-6 py-5">
       <div
@@ -155,13 +160,13 @@ function TotalCard({ total, count }) {
       <div className="relative">
         <div className="label-caps">Gross collected revenue</div>
         <div className="mt-2 font-display text-[34px] leading-none font-bold tracking-[-1.2px]">
-          ${animated.toLocaleString('en-US')}
+          {money(animated)}
         </div>
         <div className="mt-2 text-[12.5px] text-ink-soft">across {count} payments</div>
       </div>
       <div
         className="relative grid h-14 w-14 place-items-center rounded-2xl border border-white/15"
-        style={{ background: 'rgb(52 211 153 / .14)', color: '#8ff0cd' }}
+        style={{ background: 'rgb(52 211 153 / .14)', color: 'var(--gv-success)' }}
       >
         <DollarSign size={26} />
       </div>

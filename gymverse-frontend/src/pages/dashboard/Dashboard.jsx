@@ -1,3 +1,5 @@
+import { usePreferences } from '../../context/PreferencesContext';
+import { CurrencySelector } from '../../components/ui/PreferencesControls';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
@@ -26,6 +28,7 @@ const roleIntro = {
  *  member       → progress-forward: visits, bookings, membership, plan progress
  */
 export default function Dashboard() {
+  const { money } = usePreferences();
   const { user } = useAuth();
   const role = user?.role;
   const [overview, setOverview] = useState(null);
@@ -75,13 +78,14 @@ export default function Dashboard() {
   if (error) {
     return (
       <GlassPanel className="p-5" style={{ borderColor: 'rgb(251 113 133 / .35)' }}>
-        <p className="m-0 text-[#ffc2cc]">{error}</p>
+        <p className="m-0 text-[var(--gv-error)]">{error}</p>
       </GlassPanel>
     );
   }
 
   return (
     <div className="flex flex-col gap-4.5">
+      {role === 'admin' && <CurrencySelector />}
       <section className="dashboard-welcome"><div><p>{roleIntro[role]?.eyebrow}</p><h1>{roleIntro[role]?.headline}</h1><span>{roleIntro[role]?.detail}</span><div className="dashboard-welcome-actions">{roleIntro[role]?.actions.map(([label, href]) => <Link key={href} to={href}>{label}</Link>)}</div></div></section>
       <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(210px,1fr))]">
         {role === 'admin' && overview && (
@@ -92,7 +96,7 @@ export default function Dashboard() {
               trend={`${pct(overview.members.active, overview.members.total)}%`} trendTone="flat" note="of total base" delay={80} />
             <StatCard title="Today's attendance" count={overview.attendance.today} icon={CalendarCheck} tone="violet"
               trend={String(overview.attendance.onFloor)} trendTone="flat" note="on the floor now" delay={160} />
-            <StatCard title="Total revenue" count={Math.round(Number(overview.revenue.total))} prefix="$" icon={DollarSign} tone="amber"
+            <StatCard title="Total revenue" value={money(overview.revenue.total)} icon={DollarSign} tone="amber"
               trend={String(overview.revenue.outstandingCount)} trendTone={overview.revenue.outstandingCount ? 'warn' : 'flat'} note="payments pending" delay={240} />
           </>
         )}
@@ -199,6 +203,7 @@ export default function Dashboard() {
 
 /** CSS-drawn bar chart with a staggered grow-in. */
 function RevenueChart({ data }) {
+  const { money } = usePreferences();
   const max = Math.max(...data.map((d) => Number(d.revenue)));
   const total = data.reduce((a, d) => a + Number(d.revenue), 0);
   const label = (val) => parseDate(val).toLocaleDateString('default', { month: 'short' });
@@ -211,7 +216,7 @@ function RevenueChart({ data }) {
           <p className="m-0 text-[13px] text-ink-soft">Last {plural(data.length, 'month')}, completed payments</p>
         </div>
         <div className="text-right">
-          <div className="font-display text-2xl font-bold tracking-[-.8px]">${total.toLocaleString('en-US')}</div>
+          <div className="font-display text-2xl font-bold tracking-[-.8px]">{money(total)}</div>
           <div className="text-xs text-ink-muted">over this period</div>
         </div>
       </div>
@@ -219,7 +224,7 @@ function RevenueChart({ data }) {
         {data.map((d, i) => (
           <div key={d.month} className="relative flex h-full flex-1 flex-col items-center justify-end gap-2">
             <span className="font-mono text-[11px] text-ink-soft">
-              ${Math.round(Number(d.revenue) / 1000)}k
+              {money(d.revenue)}
             </span>
             <div
               className="w-full origin-bottom rounded-t-[9px] rounded-b-[3px]"
@@ -230,7 +235,7 @@ function RevenueChart({ data }) {
                 animation: 'var(--animate-grow-bar)',
                 animationDelay: `${i * 55}ms`,
               }}
-              title={`${label(d.month)}: $${Number(d.revenue).toLocaleString('en-US')}`}
+              title={`${label(d.month)}: ${money(d.revenue)}`}
             />
             <span className="absolute -bottom-6 text-[11.5px] text-ink-muted">{label(d.month)}</span>
           </div>

@@ -1,3 +1,5 @@
+import { usePreferences } from '../../context/PreferencesContext';
+import { CurrencySelector } from '../../components/ui/PreferencesControls';
 import { useState, useEffect, useCallback } from 'react';
 import { getPayments, updatePaymentStatus } from '../../services/paymentService';
 import { getErrorMessage } from '../../services/api';
@@ -22,6 +24,7 @@ const PILL_STATUS = {
 };
 
 export default function PaymentsList() {
+  const { money } = usePreferences();
   const { user } = useAuth();
   const [payments, setPayments] = useState([]);
   const [meta, setMeta] = useState(null);
@@ -103,7 +106,7 @@ export default function PaymentsList() {
       label: 'Amount',
       render: (p) => (
         <span className="font-display text-[15px] font-bold tracking-[-.3px] text-ink">
-          ${parseFloat(p.amount).toFixed(2)}
+          {money(p.amount)}
         </span>
       ),
     },
@@ -136,6 +139,7 @@ export default function PaymentsList() {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader title="Payments" subtitle={meta ? `${meta.total} invoices` : 'Collections and receipts'}>
+        <CurrencySelector />
         <SearchField
           value={filter}
           onChange={(e) => setFilter(e.target.value)}

@@ -123,7 +123,7 @@ export default function MemberProfile() {
           )}
           <GlassPanel delay={80} className="px-[22px] py-5">
             <div className="mb-4 flex items-center gap-2 border-b border-white/10 pb-3">
-              <Activity size={18} style={{ color: 'var(--gv-accent)' }} />
+              <Activity size={18} style={{ color: 'var(--color-primary)' }} />
               <h3 className="m-0 font-display text-[16.5px] font-semibold tracking-[-.2px]">Membership &amp; billing</h3>
             </div>
             {activeSub ? (
@@ -154,7 +154,7 @@ export default function MemberProfile() {
 
           <GlassPanel delay={160} className="px-[22px] py-5">
             <div className="mb-4 flex items-center gap-2 border-b border-white/10 pb-3">
-              <Calendar size={18} style={{ color: 'var(--gv-accent)' }} />
+              <Calendar size={18} style={{ color: 'var(--color-primary)' }} />
               <h3 className="m-0 font-display text-[16.5px] font-semibold tracking-[-.2px]">Recent activity</h3>
             </div>
             {recentVisits.length > 0 ? (

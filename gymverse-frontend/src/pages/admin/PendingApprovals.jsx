@@ -60,7 +60,7 @@ export default function PendingApprovals() {
             className="h-2.5 w-2.5 rounded-full"
             style={{ background: '#fbbf24', animation: 'pulseDot 1.8s ease-in-out infinite' }}
           />
-          <span className="text-sm font-semibold" style={{ color: '#ffe9b0' }}>
+          <span className="text-sm font-semibold" style={{ color: 'var(--gv-warning)' }}>
             {trainers.length} {trainers.length === 1 ? 'account' : 'accounts'} awaiting review
           </span>
         </div>
@@ -116,7 +116,7 @@ export default function PendingApprovals() {
                   onClick={() => handleReject(trainer.user_id)}
                   className="rounded-[11px] px-4 py-2.5 text-[13px] font-semibold transition-colors"
                   style={{
-                    color: '#ffd5db',
+                    color: 'var(--gv-error)',
                     background: 'rgb(251 113 133 / .14)',
                     border: '1px solid rgb(251 113 133 / .36)',
                   }}
