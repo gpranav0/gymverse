@@ -74,6 +74,17 @@ app.use('/api', rateLimit({
 }));
 
 // Health Check
+// Same-origin access lets the frontend convert prices under the existing CSP.
+app.get('/api/exchange-rates', async (_req, res) => {
+  try {
+    const { getExchangeRates } = require('./services/exchangeRateService');
+    const rates = await getExchangeRates();
+    res.set('Cache-Control', 'public, max-age=300').json(rates);
+  } catch {
+    res.status(503).json({ success: false, message: 'Exchange rates are temporarily unavailable. Please retry.' });
+  }
+});
+
 app.get('/api/health', async (req, res) => {
   try {
     const db = require('./config/database');

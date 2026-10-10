@@ -36,8 +36,8 @@ export function PreferencesProvider({ children }) {
     const controller = new AbortController();
     let active = true;
     const timeout = setTimeout(() => controller.abort(), 10000);
-    const quotes = CURRENCIES.filter(([code]) => code !== 'USD').map(([code]) => code).join(',');
-    fetch(`https://api.frankfurter.dev/v2/rates?base=USD&quotes=${quotes}`, { signal: controller.signal })
+    const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
+    fetch(`${apiBase}/exchange-rates`, { signal: controller.signal })
       .then(response => { if (!response.ok) throw new Error('Exchange rates unavailable'); return response.json(); })
       .then(rows => {
         const next = { USD: 1 };

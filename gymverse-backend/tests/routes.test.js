@@ -22,6 +22,7 @@ const request = require('supertest');
 const db = require('../src/config/database');
 const { generateChatResponse } = require('../src/services/aiService');
 const app = require('../src/app');
+const exchangeRateService = require('../src/services/exchangeRateService');
 const { generateToken } = require('../src/utils/jwt');
 const { chatCache } = require('../src/controllers/chatController');
 
@@ -32,6 +33,30 @@ const USERS = {
 };
 
 const tokenFor = (who) => generateToken(USERS[who].user_id, USERS[who].role);
+
+describe('public exchange rates', () => {
+  it('serves validated rates without authentication under the existing security policy', async () => {
+    const rates = [{ base: 'USD', quote: 'INR', rate: 96.64, date: '2026-10-09' }];
+    const spy = jest.spyOn(exchangeRateService, 'getExchangeRates').mockResolvedValueOnce(rates);
+    try {
+      const response = await request(app).get('/api/exchange-rates');
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(rates);
+      expect(response.headers['cache-control']).toBe('public, max-age=300');
+      expect(response.headers['content-security-policy']).toContain("default-src 'self'");
+    } finally { spy.mockRestore(); }
+  });
+
+  it('returns a safe retryable response when the rate provider fails', async () => {
+    const spy = jest.spyOn(exchangeRateService, 'getExchangeRates').mockRejectedValueOnce(new Error('private upstream details'));
+    try {
+      const response = await request(app).get('/api/exchange-rates');
+      expect(response.status).toBe(503);
+      expect(response.body.message).toContain('temporarily unavailable');
+      expect(JSON.stringify(response.body)).not.toContain('private upstream');
+    } finally { spy.mockRestore(); }
+  });
+});
 
 // The first query in any authenticated request is the auth middleware's user lookup.
 const authAs = (who) => db.query.mockResolvedValueOnce({ rows: [USERS[who]] });

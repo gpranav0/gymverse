@@ -1,5 +1,31 @@
 # Updating GymVerse on Neon and Render
 
+## Website update process
+
+The public website is https://gymverse-2lum.onrender.com. The existing Render service
+`gymverse` automatically deploys commits pushed to `master` in
+`https://github.com/gpranav0/gymverse`.
+
+1. Validate frontend changes from `gymverse-frontend`: `npm test -- --maxWorkers=1`
+   and `npm run build`. Run backend tests when backend code changes.
+2. From the project root, commit the intended source files and push with
+   `git push origin master`.
+3. Open https://dashboard.render.com/web/srv-dal2dt0ae00c73falgfg and wait for the
+   latest deployment to show **Live**. Auto-deploy starts on push; a second manual
+   deployment is unnecessary.
+4. Render builds the frontend, installs backend dependencies, runs pending database
+   migrations, and starts Express, which serves the built website.
+5. Open the public website and check the changed controls. Check `/api/health`
+   for database connectivity. If an old tab shows previous assets, refresh with
+   Ctrl+Shift+R.
+
+Currency conversion uses `/api/exchange-rates` on the same origin. The backend
+retrieves fixed USD currency pairs from Frankfurter and caches validated rates for
+one hour. This works with the existing Content Security Policy. Theme initialization
+uses an external `/theme-init.js` script, also compatible with that policy.
+
+## Database and environment guidance
+
 PostgreSQL is the source for live account retrieval. Local Docker uses its own database;
 updating it does not migrate Neon or redeploy Render. Atlas mirrors must be scoped by
 environment so local data cannot overwrite production profiles with the same member IDs.
